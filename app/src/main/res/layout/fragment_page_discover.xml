@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:theme="?attr/actionBarTheme"
+            android:theme="@style/toolbarTheme"
             android:minHeight="?attr/actionBarSize" android:id="@+id/toolbar"/>
+    <SearchView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@+id/toolbar"
+            android:icon="@drawable/ic_topbar_search"
+            android:showAsAction="collapseActionView|ifRoom"
+            android:queryHint="搜搜看"/>
 </RelativeLayout>
