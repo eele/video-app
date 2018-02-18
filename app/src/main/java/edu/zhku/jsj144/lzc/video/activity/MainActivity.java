@@ -1,6 +1,7 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -10,6 +11,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.fragment.DiscoverPageFragment;
 import edu.zhku.jsj144.lzc.video.fragment.FollowPageFragment;
@@ -48,7 +52,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StatusBar.setStatusBarTransparent(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
+            localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
+        }
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (NoScrollViewPager) findViewById(R.id.pager);
@@ -58,9 +65,6 @@ public class MainActivity extends AppCompatActivity {
         // Instantiate a BottomNavigationView
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        Intent intent = new Intent(MainActivity.this, FragmentPageMineActivity.class);
-        startActivity(intent);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
@@ -74,12 +78,14 @@ public class MainActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     fragment = new DiscoverPageFragment();
+                    ((DiscoverPageFragment) fragment).setActivity(MainActivity.this);
                     break;
                 case 1:
                     fragment = new FollowPageFragment();
                     break;
                 case 2:
                     fragment = new MinePageFragment();
+                    ((MinePageFragment) fragment).setActivity(MainActivity.this);
                     break;
             }
             return fragment;
