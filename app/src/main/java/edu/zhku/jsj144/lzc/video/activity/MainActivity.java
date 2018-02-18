@@ -1,5 +1,6 @@
-package edu.zhku.jsj144.lzc.video;
+package edu.zhku.jsj144.lzc.video.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,9 +10,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.fragment.DiscoverPageFragment;
 import edu.zhku.jsj144.lzc.video.fragment.FollowPageFragment;
 import edu.zhku.jsj144.lzc.video.fragment.MinePageFragment;
+import edu.zhku.jsj144.lzc.video.util.StatusBar;
 import edu.zhku.jsj144.lzc.video.viewpager.NoScrollViewPager;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        StatusBar.setStatusBarTransparent(this);
+
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (NoScrollViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -53,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
         // Instantiate a BottomNavigationView
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        Intent intent = new Intent(MainActivity.this, FragmentPageMineActivity.class);
+        startActivity(intent);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
@@ -65,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment = null;
             switch (position) {
                 case 0:
-                    fragment =  new DiscoverPageFragment();
+                    fragment = new DiscoverPageFragment();
                     break;
                 case 1:
                     fragment = new FollowPageFragment();

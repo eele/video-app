@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="edu.zhku.jsj144.lzc.video.MainActivity">
+        tools:context="edu.zhku.jsj144.lzc.video.activity.MainActivity">
 
     <FrameLayout
             android:id="@+id/content"

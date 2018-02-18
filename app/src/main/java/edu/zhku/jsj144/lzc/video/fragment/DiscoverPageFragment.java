@@ -1,11 +1,13 @@
 package edu.zhku.jsj144.lzc.video.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.util.StatusBar;
 
 public class DiscoverPageFragment extends Fragment {
 
