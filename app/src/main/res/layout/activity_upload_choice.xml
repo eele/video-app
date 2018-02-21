@@ -14,8 +14,13 @@
             android:theme="?attr/actionBarTheme"
             android:minHeight="?attr/actionBarSize" android:id="@+id/uploadToolbar"/>
     <GridLayout
+            android:paddingLeft="6px"
+            android:columnCount="3"
+            android:horizontalSpacing="6px"
+            android:verticalSpacing="10px"
+            android:layout_marginTop="@dimen/abc_action_bar_default_height_material"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent" android:id="@+id/imageViewGroup">
 
     </GridLayout>
 </RelativeLayout>
