@@ -1,21 +1,19 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
+import android.support.v7.widget.GridLayout;
+import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.util.UnitUtil;
 import edu.zhku.jsj144.lzc.video.util.VideoInfo;
 import edu.zhku.jsj144.lzc.video.util.VideoInfoUtil;
 
@@ -30,49 +28,85 @@ public class UploadChoiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload_choice);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.uploadToolbar);
-        toolbar.inflateMenu(R.menu.upload_choice_toolbar);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.upload_choice_close) {
-                    UploadChoiceActivity.this.finish();
-                }
-                return true;
+            public void onClick(View v) {
+                UploadChoiceActivity.this.finish();
             }
         });
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         List<VideoInfo> videoList = VideoInfoUtil.getVideoList(UploadChoiceActivity.this);
-        ViewGroup group = (ViewGroup) findViewById(R.id.imageViewGroup);
-        ImageView imageView = new ImageView(this);  //创建imageview
-        WindowManager manager = this.getWindowManager();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        manager.getDefaultDisplay().getMetrics(outMetrics);
-        int width = outMetrics.widthPixels;
-        imageView.setLayoutParams(new ViewGroup.LayoutParams(width / 3 - 6, width / 4 - 6));  //image的布局方式
-        imageView.setImageURI(Uri.fromFile(new File(videoList.get(0).getThumbPath())));
 
-        TextView dateTextView = new TextView(this);
-        dateTextView.setText("2001-01-01");
-        dateTextView.setHeight(50);
-        dateTextView.setWidth(260);
-        dateTextView.setPadding(0,0,0,0);
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.videoViewGroup);
+        String dateTaken = "";
+        for (VideoInfo videoInfo : videoList) {
+            String newDateTaken = VideoInfoUtil.stampToDate(videoInfo.getDateTaken());
+            if (! newDateTaken.equals(dateTaken)) {  // 显示拍摄日期
+                dateTaken = newDateTaken;
+                addTextView(gridLayout, dateTaken);
+            }
 
-//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//        layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
-        dateTextView.setGravity(Gravity.CENTER_HORIZONTAL);
-//        dateTextView.setLayoutParams(layoutParams);
-        dateTextView.setTextColor(Color.WHITE);
-        dateTextView.getPaint().setFakeBoldText(true);
-
-        FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.addView(imageView);
-        frameLayout.addView(dateTextView);
-
-        group.addView(frameLayout);  //添加到布局容器中，显示图片。
+            // 显示缩略图
+            addVideoView(gridLayout, videoInfo);
+        }
     }
+
+    /**
+     * 显示拍摄日期
+     * @param gridLayout
+     * @param dateTaken
+     */
+    private void addTextView(GridLayout gridLayout, String dateTaken) {
+        TextView dateTextView = new TextView(this);
+        dateTextView.setText(dateTaken);
+        dateTextView.getPaint().setFakeBoldText(true);
+        dateTextView.setTextColor(Color.GRAY);
+        dateTextView.setBackgroundColor(Color.WHITE);
+        dateTextView.setTextSize(16f);
+        dateTextView.setPadding(UnitUtil.dip2px(this, 20),0,0,0);
+        dateTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT | Gravity.FILL_HORIZONTAL);
+
+        GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+        layoutParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 3,3f);
+        layoutParams.height = UnitUtil.dip2px(this, 40);
+        layoutParams.topMargin = UnitUtil.dip2px(this, 3);
+
+        gridLayout.addView(dateTextView, layoutParams);
+    }
+
+    /**
+     * 显示视频缩略图
+     * @param gridLayout
+     * @param videoInfo
+     */
+    private void addVideoView(GridLayout gridLayout, final VideoInfo videoInfo) {
+        ImageView imageView = new ImageView(this);
+        if (videoInfo.getThumbPath() != null) {
+            imageView.setImageURI(Uri.fromFile(new File(videoInfo.getThumbPath())));
+        } else {
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setImageResource(R.mipmap.ic_video_default);
+        }
+        imageView.setBackgroundColor(Color.BLACK);
+
+        GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+        layoutParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED,1f);
+        layoutParams.height = UnitUtil.dip2px(this, 40);
+        layoutParams.leftMargin = UnitUtil.dip2px(this, 3);
+        layoutParams.topMargin = UnitUtil.dip2px(this, 3);
+        layoutParams.height = UnitUtil.dip2px(this, 90);
+        imageView.setLayoutParams(layoutParams);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UploadChoiceActivity.this, UploadPreviewActivity.class);
+                intent.putExtra("path", videoInfo.getPath());
+                startActivity(intent);
+            }
+        });
+
+        gridLayout.addView(imageView);
+    }
+
 }

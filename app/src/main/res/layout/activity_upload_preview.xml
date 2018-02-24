@@ -21,20 +21,18 @@
                 android:layout_gravity="center"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
-                android:text="本地视频"
+                android:text="预览"
                 android:textSize="20sp" />
     </android.support.v7.widget.Toolbar>
-    <ScrollView
+    <LinearLayout
             android:layout_marginTop="@dimen/abc_action_bar_default_height_material"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        <android.support.v7.widget.GridLayout
-                app:columnCount="3"
-                android:paddingBottom="30dp"
-                android:layout_marginRight="3dp"
+        <VideoView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/videoViewGroup">
-
-        </android.support.v7.widget.GridLayout>
-    </ScrollView>
+                android:layout_height="200dp"
+                android:id="@+id/previewVideoView"
+        />
+    </LinearLayout>
 </RelativeLayout>

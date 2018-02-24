@@ -4,7 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class VideoInfoUtil {
@@ -28,7 +30,7 @@ public class VideoInfoUtil {
                 MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 mediaColumns, null, null, MediaStore.Video.Media.DATE_MODIFIED);
 
-        if(cursor==null){
+        if (cursor == null) {
             return sysVideoList;
         }
         if (cursor.moveToFirst()) {
@@ -59,5 +61,14 @@ public class VideoInfoUtil {
         }
 
         return sysVideoList;
+    }
+
+    public static String stampToDate(String s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        long lt = new Long(s);
+        Date date = new Date(lt);
+        res = simpleDateFormat.format(date);
+        return res;
     }
 }
