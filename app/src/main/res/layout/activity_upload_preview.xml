@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="edu.zhku.jsj144.lzc.video.activity.UploadChoiceActivity">
@@ -21,18 +22,138 @@
                 android:layout_gravity="center"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
-                android:text="预览"
+                android:text="详情"
                 android:textSize="20sp" />
     </android.support.v7.widget.Toolbar>
-    <LinearLayout
-            android:layout_marginTop="@dimen/abc_action_bar_default_height_material"
-            android:orientation="horizontal"
+    <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <VideoView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:id="@+id/previewVideoView"
-        />
-    </LinearLayout>
-</RelativeLayout>
+            android:layout_height="418dp" android:layout_weight="0.51">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="vertical">
+            <edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:id="@+id/previewVideoView"
+                    android:layout_weight="1"/>
+            <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/control">
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:background="@android:color/transparent"
+                        android:layout_height="wrap_content" app:srcCompat="@drawable/ic_action_play"
+                        android:id="@+id/playButton" android:layout_weight="0.01"/>
+                <SeekBar
+                        android:layout_gravity="center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/videoSeekBar"
+                        android:layout_weight="1"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:background="@drawable/border"
+                    android:layout_marginTop="30dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:layout_weight="1">
+                <TextView
+                        android:text="标题"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_width="66dp"
+                        android:layout_height="match_parent"/>
+                <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@null"
+                        android:inputType="text"
+                        android:textSize="16sp"
+                        android:layout_weight="1"
+                        android:id="@+id/v_title"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:background="@drawable/border"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:layout_weight="1">
+                <TextView
+                        android:text="分类"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_width="66dp"
+                        android:layout_height="match_parent"/>
+                <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@null"
+                        android:inputType="text"
+                        android:textSize="16sp"
+                        android:layout_weight="1"
+                        android:id="@+id/v_category"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:background="@drawable/border"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:layout_weight="1">
+                <TextView
+                        android:text="描述"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_width="66dp"
+                        android:layout_height="match_parent"/>
+                <EditText
+                        android:hint="介绍一下这个视频吧~"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@null"
+                        android:inputType="text"
+                        android:textSize="16sp"
+                        android:layout_weight="1"
+                        android:id="@+id/v_desc"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:background="@drawable/border"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:layout_weight="1">
+                <TextView
+                        android:text="隐私设置"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"/>
+                <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@null"
+                        android:inputType="text"
+                        android:textSize="16sp"
+                        android:layout_weight="1"
+                        android:id="@+id/v_privacy"/>
+            </LinearLayout>
+            <Button
+                    android:text="上 传"
+                    android:textStyle="bold"
+                    android:background="#5577ef"
+                    android:textColor="@android:color/white"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="15dp"
+                    android:textSize="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/uploadConfirmButton"
+                    android:layout_weight="1">
+            </Button>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

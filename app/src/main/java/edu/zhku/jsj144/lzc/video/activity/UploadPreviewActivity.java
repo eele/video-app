@@ -1,32 +1,24 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
-import android.content.Intent;
-import android.graphics.Color;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.MediaController;
-import android.widget.TextView;
-import android.widget.VideoView;
+import android.widget.*;
 import edu.zhku.jsj144.lzc.video.R;
-import edu.zhku.jsj144.lzc.video.util.UnitUtil;
-import edu.zhku.jsj144.lzc.video.util.VideoInfo;
-import edu.zhku.jsj144.lzc.video.util.VideoInfoUtil;
-
-import java.io.File;
-import java.util.List;
+import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
+import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
+import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
+import tv.danmaku.ijk.media.player.IMediaPlayer;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 public class UploadPreviewActivity extends AppCompatActivity {
 
-    private VideoView videoView;
+    private VideoPlayerIJK ijkPlayer;
+    private SeekBar seekBar;
+    private SeekThread seekThread = new SeekThread();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,26 +32,171 @@ public class UploadPreviewActivity extends AppCompatActivity {
                 UploadPreviewActivity.this.finish();
             }
         });
+        final ImageButton playButton = (ImageButton) findViewById(R.id.playButton);
+        seekBar = (SeekBar) findViewById(R.id.videoSeekBar);
+
+        // 显示默认视频标题
+        String videoTitle = getIntent().getStringExtra("title");
+        EditText titleEditText = (EditText) findViewById(R.id.v_title);
+        titleEditText.setText(videoTitle);
 
         // 视频地址
-        String videoPath = getIntent().getStringExtra("path");
+        final String videoPath = getIntent().getStringExtra("path");
 
-        videoView = (VideoView)this.findViewById(R.id.previewVideoView );
-        // 设置视频控制器
-        videoView.setMediaController(new MediaController(this));
-        // 播放完成回调
-        videoView.setOnCompletionListener( new PlayerOnCompletionListener());
-        // 设置视频路径
-        videoView.setVideoPath(videoPath);
-        // 开始播放视频
-        videoView.start();
+        // 确认上传按钮
+        Button uploadConfirmButton = (Button) findViewById(R.id.uploadConfirmButton);
+        uploadConfirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            UploadClient.setUid("aa");
+                            UploadClient.startUpload(videoPath, "123");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Looper.prepare();
+                            Toast.makeText(
+                                    UploadPreviewActivity.this,
+                                    "上传失败", Toast.LENGTH_LONG).show();
+                            Looper.loop();
+                        }
+                    }
+                }.start();
+            }
+        });
+
+        //加载so文件
+        try {
+            IjkMediaPlayer.loadLibrariesOnce(null);
+            IjkMediaPlayer.native_profileBegin("libijkplayer.so");
+        } catch (Exception e) {
+            this.finish();
+        }
+
+        ijkPlayer = (VideoPlayerIJK) findViewById(R.id.previewVideoView);
+        ijkPlayer.setVideoPath(videoPath);
+        ijkPlayer.setListener(new VideoPlayerListener() {
+            @Override
+            public void onBufferingUpdate(IMediaPlayer mp, int percent) {}
+
+            @Override
+            public void onCompletion(IMediaPlayer mp) {
+                mp.seekTo(0);
+                seekThread.setPause();
+                playButton.setImageResource(R.drawable.ic_action_play);
+            }
+
+            @Override
+            public boolean onError(IMediaPlayer mp, int what, int extra) {
+                return false;
+            }
+
+            @Override
+            public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+                return false;
+            }
+
+            @Override
+            public void onPrepared(final IMediaPlayer mp) {
+                playButton.setImageResource(R.drawable.ic_action_pause);
+                playButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mp.isPlaying()) {
+                            playButton.setImageResource(R.drawable.ic_action_play);
+                            mp.pause();
+                            seekThread.setPause();
+                        } else {
+                            playButton.setImageResource(R.drawable.ic_action_pause);
+                            mp.start();
+                            seekThread.setStart();
+                        }
+                    }
+                });
+
+                if (mp.getDuration() > 2147483647) {
+                    seekBar.setMax(2147483647);
+                } else {
+                    seekBar.setMax((int) mp.getDuration());
+                }
+                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    private boolean touch = false;
+
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (touch == true) {
+                            ijkPlayer.seekTo(progress);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        touch = true;
+                        playButton.setImageResource(R.drawable.ic_action_play);
+                        ijkPlayer.pause();
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        touch = false;
+                        playButton.setImageResource(R.drawable.ic_action_pause);
+                        ijkPlayer.start();
+                    }
+                });
+                seekBar.setProgress(0);
+                seekThread.start();
+                mp.start();
+            }
+
+            @Override
+            public void onSeekComplete(IMediaPlayer mp) {}
+
+            @Override
+            public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {}
+        });
     }
 
-    class PlayerOnCompletionListener implements MediaPlayer.OnCompletionListener {
+    @Override
+    protected void onStop() {
+        super.onStop();
+        seekThread.setStop();
+        ijkPlayer.stop();
+        IjkMediaPlayer.native_profileEnd();
+    }
+
+    private class SeekThread extends Thread {
+
+        private boolean stop = false;
+        private boolean pause = false;
+
+        public void setStop() {
+            stop = true;
+        }
+
+        public void setPause() {
+            pause = true;
+        }
+
+        public void setStart() {
+            pause = false;
+        }
 
         @Override
-        public void onCompletion(MediaPlayer mp) {
-            //Toast.makeText( LocalVideoActivity.this, "播放完成了", Toast.LENGTH_SHORT).show();
+        public void run() {
+            while (stop == false) {
+                try {
+                    if (pause == false) {
+                        seekBar.setProgress((int) ijkPlayer.getCurrentPosition());
+                    }
+                    sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            stop = false;
         }
     }
+
 }

@@ -102,6 +102,7 @@ public class UploadChoiceActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(UploadChoiceActivity.this, UploadPreviewActivity.class);
                 intent.putExtra("path", videoInfo.getPath());
+                intent.putExtra("title", videoInfo.getTitle());
                 startActivity(intent);
             }
         });
