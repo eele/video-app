@@ -51,6 +51,13 @@ public class UploadChoiceActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if(resultCode == RESULT_OK ){
+            finish();
+        }
+    }
+
     /**
      * 显示拍摄日期
      * @param gridLayout
@@ -103,7 +110,7 @@ public class UploadChoiceActivity extends AppCompatActivity {
                 Intent intent = new Intent(UploadChoiceActivity.this, UploadPreviewActivity.class);
                 intent.putExtra("path", videoInfo.getPath());
                 intent.putExtra("title", videoInfo.getTitle());
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
 

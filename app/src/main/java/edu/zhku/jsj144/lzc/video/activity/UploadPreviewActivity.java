@@ -1,5 +1,6 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
@@ -48,22 +49,31 @@ public class UploadPreviewActivity extends AppCompatActivity {
         uploadConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            UploadClient.setUid("aa");
-                            UploadClient.startUpload(videoPath, "123");
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Looper.prepare();
-                            Toast.makeText(
-                                    UploadPreviewActivity.this,
-                                    "上传失败", Toast.LENGTH_LONG).show();
-                            Looper.loop();
-                        }
-                    }
-                }.start();
+                UploadPreviewActivity.this.setResult(RESULT_OK, null);
+                UploadPreviewActivity.this.finish();
+                Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
+                intent.putExtra("path", videoPath);
+                intent.putExtra("vid", "123");
+                intent.putExtra("uid", "aa");
+                startActivity(intent);
+
+//                new Thread() {
+//                    @Override
+//                    public void run() {
+//
+//                        try {
+//                            UploadClient.setUid("aa");
+//                            UploadClient.startUpload(videoPath, "123");
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            Looper.prepare();
+//                            Toast.makeText(
+//                                    UploadPreviewActivity.this,
+//                                    "上传失败", Toast.LENGTH_LONG).show();
+//                            Looper.loop();
+//                        }
+//                    }
+//                }.start();
             }
         });
 
@@ -116,11 +126,8 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     }
                 });
 
-                if (mp.getDuration() > 2147483647) {
-                    seekBar.setMax(2147483647);
-                } else {
-                    seekBar.setMax((int) mp.getDuration());
-                }
+                // 进度条
+                seekBar.setMax((int) mp.getDuration());
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     private boolean touch = false;
 
@@ -141,8 +148,6 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
                         touch = false;
-                        playButton.setImageResource(R.drawable.ic_action_pause);
-                        ijkPlayer.start();
                     }
                 });
                 seekBar.setProgress(0);

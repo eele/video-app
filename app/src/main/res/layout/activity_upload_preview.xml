@@ -52,6 +52,12 @@
                         android:id="@+id/videoSeekBar"
                         android:layout_weight="1"/>
             </LinearLayout>
+            <TextView
+                    android:text="暂停或拖动进度条确定视频封面"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp" android:id="@+id/textView" android:layout_weight="1"/>
             <LinearLayout
                     android:background="@drawable/border"
                     android:layout_marginTop="30dp"

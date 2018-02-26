@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="edu.zhku.jsj144.lzc.video">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
@@ -18,17 +21,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity android:name=".activity.UploadChoiceActivity">
         </activity>
-
-        <activity android:name=".activity.UploadPreviewActivity"
-                  android:windowSoftInputMode="stateHidden">
+        <activity
+                android:name=".activity.UploadPreviewActivity"
+                android:windowSoftInputMode="stateHidden">
         </activity>
-
+        <activity android:name=".activity.UploadProcessingActivity">
+        </activity>
+        <activity android:name=".activity.PlayActivity">
+        </activity>
     </application>
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
