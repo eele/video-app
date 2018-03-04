@@ -1,25 +1,38 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.broadcast.UploadBroadcast;
+import edu.zhku.jsj144.lzc.video.dialog.CustomProgressDialog;
+import edu.zhku.jsj144.lzc.video.service.UploadService;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
 import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
+import okhttp3.*;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class UploadPreviewActivity extends AppCompatActivity {
 
     private VideoPlayerIJK ijkPlayer;
     private SeekBar seekBar;
     private SeekThread seekThread = new SeekThread();
+
+    private OkHttpClient client = new OkHttpClient();
+    private String url = "http://192.168.0.149:8080/video/service/video";
+    private final MediaType FORM
+            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,31 +62,7 @@ public class UploadPreviewActivity extends AppCompatActivity {
         uploadConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UploadPreviewActivity.this.setResult(RESULT_OK, null);
-                UploadPreviewActivity.this.finish();
-                Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
-                intent.putExtra("path", videoPath);
-                intent.putExtra("vid", "123");
-                intent.putExtra("uid", "aa");
-                startActivity(intent);
-
-//                new Thread() {
-//                    @Override
-//                    public void run() {
-//
-//                        try {
-//                            UploadClient.setUid("aa");
-//                            UploadClient.startUpload(videoPath, "123");
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                            Looper.prepare();
-//                            Toast.makeText(
-//                                    UploadPreviewActivity.this,
-//                                    "上传失败", Toast.LENGTH_LONG).show();
-//                            Looper.loop();
-//                        }
-//                    }
-//                }.start();
+                postVideo();
             }
         });
 
@@ -105,7 +94,11 @@ public class UploadPreviewActivity extends AppCompatActivity {
 
             @Override
             public boolean onInfo(IMediaPlayer mp, int what, int extra) {
-                return false;
+                if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
+                    //这里返回了视频旋转的角度，根据角度旋转视频到正确的画面
+                    ijkPlayer.setRotation(extra);
+                }
+                return true;
             }
 
             @Override
@@ -169,6 +162,78 @@ public class UploadPreviewActivity extends AppCompatActivity {
         seekThread.setStop();
         ijkPlayer.stop();
         IjkMediaPlayer.native_profileEnd();
+    }
+
+    private void postVideo() {
+        final CustomProgressDialog dialog =
+                new CustomProgressDialog(UploadPreviewActivity.this, R.style.CustomDialog);
+        dialog.show();
+
+        RequestBody body = RequestBody.create(FORM, "title=%E7%A4%BA%E4%BE%8B%E8%A7%86%E9%A2%91&uid=c257c5ace0ff4b69bf889c0cb3cb4476&cid=qw&description=%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E8%A7%86%E9%A2%91&permission=0");
+        final Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                dialog.dismiss();
+                Toast.makeText(
+                        UploadPreviewActivity.this,
+                        "连接异常", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                dialog.dismiss();
+                if (response.code() == 200) {
+                    UploadClient.setUid("aa");
+
+                    // 注册广播
+//                    UploadBroadcast uploadBroadcast = new UploadBroadcast();
+//                    IntentFilter intentFilter = new IntentFilter();
+//                    intentFilter.addAction("UPLOAD");
+//                    registerReceiver(uploadBroadcast, intentFilter);
+
+                    // 启动上传服务
+                    Intent startIntent = new Intent(UploadPreviewActivity.this, UploadService.class);
+                    Map<String,Object> vidData = new ObjectMapper().readValue(response.body().string(), Map.class);
+                    startIntent.putExtra("path", getIntent().getStringExtra("path"));
+                    startIntent.putExtra("vid", (String) vidData.get("id"));
+                    startService(startIntent);
+
+                    UploadPreviewActivity.this.setResult(RESULT_OK, null);
+                    UploadPreviewActivity.this.finish();
+                    Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
+                    startActivity(intent);
+                }
+                if (response.code() == 500) {
+                    Map<String,Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
+                    Looper.prepare();
+                    Toast.makeText(
+                            UploadPreviewActivity.this, (String) info.get("msg"), Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                }
+            }
+        });
+
+//        new Thread() {
+//            @Override
+//            public void run() {
+//
+//                try {
+//                    UploadClient.setUid("aa");
+//                    UploadClient.startUpload(getIntent().getStringExtra("path"), "123");
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    Looper.prepare();
+//                    Toast.makeText(
+//                            UploadProcessingActivity.this,
+//                            "上传失败", Toast.LENGTH_LONG).show();
+//                    Looper.loop();
+//                }
+//            }
+//        }.start();
     }
 
     private class SeekThread extends Thread {

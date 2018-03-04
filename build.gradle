@@ -2,7 +2,13 @@
 
 buildscript {
     repositories {
+//        maven {
+//            url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2'
+//        }
         jcenter()
+        flatDir {
+            dirs 'libs'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.0'
@@ -14,7 +20,13 @@ buildscript {
 
 allprojects {
     repositories {
+//        maven {
+//            url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2'
+//        }
         jcenter()
+        flatDir {
+            dirs 'libs'
+        }
     }
 }
 

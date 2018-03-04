@@ -3,16 +3,16 @@ package edu.zhku.jsj144.lzc.video.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import edu.zhku.jsj144.lzc.video.R;
-import edu.zhku.jsj144.lzc.video.util.StatusBar;
 
 public class DiscoverPageFragment extends Fragment {
 
     private Activity activity;
+    private WebView webView;
 
     public void setActivity(Activity activity) {
         this.activity = activity;
@@ -24,9 +24,18 @@ public class DiscoverPageFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_page_discover, container, false);
 
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.discoverToolbar);
-        toolbar.setPadding(0, StatusBar.getStatusHeight(activity), 0, 0);
+        webView = (WebView) rootView.findViewById(R.id.discoverWebview);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.loadUrl("http://192.168.0.149:8080");
 
+//        rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(activity, PlayActivity.class);
+//                startActivity(intent);
+//            }
+//        });
         return rootView;
     }
+
 }

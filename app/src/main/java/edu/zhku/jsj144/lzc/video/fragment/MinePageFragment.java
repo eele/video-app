@@ -32,35 +32,11 @@ public class MinePageFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                showPopupMenu(v);
+                Intent intent = new Intent(activity, UploadChoiceActivity.class);
+                startActivity(intent);
             }
         });
         return rootView;
-    }
-
-    private void showPopupMenu(View view) {
-        // View当前PopupMenu显示的相对View的位置
-        PopupMenu popupMenu = new PopupMenu(activity, view);
-        // menu布局
-        popupMenu.getMenuInflater().inflate(R.menu.menu_upload, popupMenu.getMenu());
-        // menu的item点击事件
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_upload_new:
-
-                        return true;
-                    case R.id.action_upload_cho:
-                        Intent intent = new Intent(activity, UploadChoiceActivity.class);
-                        startActivity(intent);
-                        return true;
-                }
-                return false;
-            }
-        });
-
-        popupMenu.show();
     }
 
 }

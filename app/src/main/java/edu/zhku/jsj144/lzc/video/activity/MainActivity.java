@@ -1,7 +1,6 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -11,14 +10,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.fragment.DiscoverPageFragment;
 import edu.zhku.jsj144.lzc.video.fragment.FollowPageFragment;
 import edu.zhku.jsj144.lzc.video.fragment.MinePageFragment;
-import edu.zhku.jsj144.lzc.video.util.StatusBar;
 import edu.zhku.jsj144.lzc.video.viewpager.NoScrollViewPager;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,11 +47,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
-            localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
-        }
-
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (NoScrollViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -65,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
         // Instantiate a BottomNavigationView
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        Intent intent = new Intent(MainActivity.this, UploadProcessingActivity.class);
+        startActivity(intent);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

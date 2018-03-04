@@ -1,25 +1,22 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayout;
+import android.os.Looper;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import edu.zhku.jsj144.lzc.video.R;
-import edu.zhku.jsj144.lzc.video.util.UnitUtil;
-import edu.zhku.jsj144.lzc.video.util.VideoInfo;
-import edu.zhku.jsj144.lzc.video.util.VideoInfoUtil;
+import edu.zhku.jsj144.lzc.video.service.UploadService;
+import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
+import okhttp3.*;
 
-import java.io.File;
-import java.util.List;
+import java.io.IOException;
+import java.util.Map;
 
-public class UploadProcessingActivity extends AppCompatActivity {
+public class UploadProcessingActivity extends InterceptorActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

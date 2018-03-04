@@ -22,18 +22,11 @@
                 android:layout_gravity="center"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
-                android:text="上传中"
-                android:textSize="20sp" />
+                android:text="我的视频"
+                android:textSize="20sp"/>
     </android.support.v7.widget.Toolbar>
-    <LinearLayout
-            android:orientation="vertical"
+    <WebView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" android:weightSum="1" android:id="@+id/processingView">
-        <edu.zhku.jsj144.lzc.video.view.CircleProgressBar
-                android:id="@+id/circleProgressbar"
-                android:layout_width="74dp"
-                android:layout_height="74dp"
-                android:layout_centerInParent="true" />
-    </LinearLayout>
+            android:layout_height="match_parent" android:id="@+id/uploadWebview"/>
 
 </LinearLayout>

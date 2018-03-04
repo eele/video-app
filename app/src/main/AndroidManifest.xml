@@ -4,6 +4,13 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.READ_PROFILE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <application
             android:allowBackup="true"
@@ -14,23 +21,41 @@
             android:theme="@style/AppTheme">
         <activity
                 android:name=".activity.MainActivity"
-                android:label="@string/app_name">
+                android:label="@string/app_name"
+                android:screenOrientation="portrait"
+                android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.UploadChoiceActivity">
+        <activity
+                android:name=".activity.UploadChoiceActivity"
+                android:screenOrientation="portrait">
         </activity>
         <activity
                 android:name=".activity.UploadPreviewActivity"
+                android:screenOrientation="portrait"
                 android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".activity.UploadProcessingActivity">
+        <activity
+                android:name=".activity.UploadProcessingActivity"
+                android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".activity.PlayActivity">
+        <activity
+                android:name=".activity.PlayActivity"
+                android:hardwareAccelerated="true"
+                android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".activity.InterceptorActivity">
+        </activity>
+
+        <service
+                android:name=".service.UploadService"
+                android:enabled="true"
+                android:exported="false">
+        </service>
     </application>
 
 </manifest>

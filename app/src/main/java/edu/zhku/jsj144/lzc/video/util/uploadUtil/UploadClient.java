@@ -42,7 +42,7 @@ public class UploadClient {
 
 			});
 
-			ChannelFuture channelFuture = bootstrap.connect("localhost", 8086).sync();
+			ChannelFuture channelFuture = bootstrap.connect("192.168.0.149", 8086).sync();
 			channelFuture.channel().closeFuture().sync();
 		} finally {
 			eventLoopGroup.shutdownGracefully();
