@@ -1,8 +1,10 @@
 package edu.zhku.jsj144.lzc.video.util.uploadUtil;
 
+import android.util.Log;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultFileRegion;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.stream.ChunkedFile;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -24,8 +26,8 @@ public class UploadClientHandler extends SimpleChannelInboundHandler<String> {
 		try {
 			raf = new RandomAccessFile(localFilepath, "r");
 			totalLength = raf.length();
-			ctx.write(new DefaultFileRegion(raf.getChannel(), info.getFinishedSize(), totalLength));
-			ctx.writeAndFlush("\n");
+			ctx.writeAndFlush(
+			        new ChunkedFile(raf, info.getFinishedSize(), totalLength - info.getFinishedSize(), 8192));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

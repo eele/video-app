@@ -9,19 +9,19 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="15dp">
         <ProgressBar
                 android:id="@+id/pb_load"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:layout_centerInParent="true"/>
     </RelativeLayout>
-    <TextView
-            android:id="@+id/tv_load_dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="加载中"
-            android:textColor="#9a9b98"
-            android:textSize="12sp"/>
+    <!--<TextView-->
+            <!--android:id="@+id/tv_load_dialog"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:text="加载中"-->
+            <!--android:textColor="#9a9b98"-->
+            <!--android:textSize="12sp"/>-->
 </LinearLayout>

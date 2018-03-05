@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        Intent intent = new Intent(MainActivity.this, UploadProcessingActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(MainActivity.this, UploadProcessingActivity.class);
+//        startActivity(intent);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

@@ -178,22 +178,17 @@ public class UploadPreviewActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call call, IOException e) {
                 dialog.dismiss();
+                Looper.prepare();
                 Toast.makeText(
                         UploadPreviewActivity.this,
                         "连接异常", Toast.LENGTH_LONG).show();
+                Looper.loop();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 dialog.dismiss();
                 if (response.code() == 200) {
-                    UploadClient.setUid("aa");
-
-                    // 注册广播
-//                    UploadBroadcast uploadBroadcast = new UploadBroadcast();
-//                    IntentFilter intentFilter = new IntentFilter();
-//                    intentFilter.addAction("UPLOAD");
-//                    registerReceiver(uploadBroadcast, intentFilter);
 
                     // 启动上传服务
                     Intent startIntent = new Intent(UploadPreviewActivity.this, UploadService.class);
@@ -202,10 +197,10 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     startIntent.putExtra("vid", (String) vidData.get("id"));
                     startService(startIntent);
 
-                    UploadPreviewActivity.this.setResult(RESULT_OK, null);
-                    UploadPreviewActivity.this.finish();
-                    Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
-                    startActivity(intent);
+//                    UploadPreviewActivity.this.setResult(RESULT_OK, null);
+//                    UploadPreviewActivity.this.finish();
+//                    Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
+//                    startActivity(intent);
                 }
                 if (response.code() == 500) {
                     Map<String,Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
@@ -217,23 +212,6 @@ public class UploadPreviewActivity extends AppCompatActivity {
             }
         });
 
-//        new Thread() {
-//            @Override
-//            public void run() {
-//
-//                try {
-//                    UploadClient.setUid("aa");
-//                    UploadClient.startUpload(getIntent().getStringExtra("path"), "123");
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    Looper.prepare();
-//                    Toast.makeText(
-//                            UploadProcessingActivity.this,
-//                            "上传失败", Toast.LENGTH_LONG).show();
-//                    Looper.loop();
-//                }
-//            }
-//        }.start();
     }
 
     private class SeekThread extends Thread {
