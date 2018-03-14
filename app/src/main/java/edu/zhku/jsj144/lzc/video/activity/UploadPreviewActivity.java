@@ -1,7 +1,6 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +9,10 @@ import android.view.View;
 import android.widget.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.zhku.jsj144.lzc.video.R;
-import edu.zhku.jsj144.lzc.video.broadcast.UploadBroadcast;
 import edu.zhku.jsj144.lzc.video.dialog.CustomProgressDialog;
 import edu.zhku.jsj144.lzc.video.service.UploadService;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
-import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
 import okhttp3.*;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
@@ -30,7 +27,7 @@ public class UploadPreviewActivity extends AppCompatActivity {
     private SeekThread seekThread = new SeekThread();
 
     private OkHttpClient client = new OkHttpClient();
-    private String url = "http://192.168.0.149:8080/video/service/video";
+    private String url = "http://192.168.0.149:8080/video/service/j/videos";
     private final MediaType FORM
             = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 
@@ -96,7 +93,7 @@ public class UploadPreviewActivity extends AppCompatActivity {
             public boolean onInfo(IMediaPlayer mp, int what, int extra) {
                 if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
                     //这里返回了视频旋转的角度，根据角度旋转视频到正确的画面
-                    ijkPlayer.setRotation(extra);
+//                    ijkPlayer.setRotation(extra);
                 }
                 return true;
             }
@@ -197,16 +194,21 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     startIntent.putExtra("vid", (String) vidData.get("id"));
                     startService(startIntent);
 
-//                    UploadPreviewActivity.this.setResult(RESULT_OK, null);
-//                    UploadPreviewActivity.this.finish();
-//                    Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
-//                    startActivity(intent);
-                }
-                if (response.code() == 500) {
+                    // 打开上传视频列表
+                    UploadPreviewActivity.this.setResult(RESULT_OK, null);
+                    UploadPreviewActivity.this.finish();
+                    Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
+                    startActivity(intent);
+                } else if (response.code() == 500) {
                     Map<String,Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
                     Looper.prepare();
                     Toast.makeText(
                             UploadPreviewActivity.this, (String) info.get("msg"), Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                } else {
+                    Looper.prepare();
+                    Toast.makeText(
+                            UploadPreviewActivity.this, "访问异常，请稍后重试", Toast.LENGTH_LONG).show();
                     Looper.loop();
                 }
             }

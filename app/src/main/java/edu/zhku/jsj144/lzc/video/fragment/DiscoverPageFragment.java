@@ -26,7 +26,7 @@ public class DiscoverPageFragment extends Fragment {
 
         webView = (WebView) rootView.findViewById(R.id.discoverWebview);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("http://192.168.0.149:8080");
+        webView.loadUrl("http://192.168.0.149:8080/myvideo");
 
 //        rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
 //            @Override
