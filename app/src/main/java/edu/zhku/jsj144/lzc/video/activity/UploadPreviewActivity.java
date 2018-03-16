@@ -22,14 +22,13 @@ import java.util.Map;
 
 public class UploadPreviewActivity extends AppCompatActivity {
 
+    private final MediaType FORM
+            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
     private VideoPlayerIJK ijkPlayer;
     private SeekBar seekBar;
     private SeekThread seekThread = new SeekThread();
-
     private OkHttpClient client = new OkHttpClient();
-    private String url = "http://192.168.0.149:8080/video/service/j/videos";
-    private final MediaType FORM
-            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
+    private String url = "http://192.168.0.149:8080/video/service/r/videos";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +74,8 @@ public class UploadPreviewActivity extends AppCompatActivity {
         ijkPlayer.setVideoPath(videoPath);
         ijkPlayer.setListener(new VideoPlayerListener() {
             @Override
-            public void onBufferingUpdate(IMediaPlayer mp, int percent) {}
+            public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+            }
 
             @Override
             public void onCompletion(IMediaPlayer mp) {
@@ -146,10 +146,12 @@ public class UploadPreviewActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onSeekComplete(IMediaPlayer mp) {}
+            public void onSeekComplete(IMediaPlayer mp) {
+            }
 
             @Override
-            public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {}
+            public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
+            }
         });
     }
 
@@ -185,11 +187,11 @@ public class UploadPreviewActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 dialog.dismiss();
-                if (response.code() == 200) {
-
+                switch (response.code()) {
+                case 200:
                     // 启动上传服务
                     Intent startIntent = new Intent(UploadPreviewActivity.this, UploadService.class);
-                    Map<String,Object> vidData = new ObjectMapper().readValue(response.body().string(), Map.class);
+                    Map<String, Object> vidData = new ObjectMapper().readValue(response.body().string(), Map.class);
                     startIntent.putExtra("path", getIntent().getStringExtra("path"));
                     startIntent.putExtra("vid", (String) vidData.get("id"));
                     startService(startIntent);
@@ -199,16 +201,24 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     UploadPreviewActivity.this.finish();
                     Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
                     startActivity(intent);
-                } else if (response.code() == 500) {
-                    Map<String,Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
+                    break;
+                case 500:
+                    Map<String, Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
                     Looper.prepare();
                     Toast.makeText(
                             UploadPreviewActivity.this, (String) info.get("msg"), Toast.LENGTH_LONG).show();
                     Looper.loop();
-                } else {
+                    break;
+                case 403:
                     Looper.prepare();
                     Toast.makeText(
-                            UploadPreviewActivity.this, "访问异常，请稍后重试", Toast.LENGTH_LONG).show();
+                            UploadPreviewActivity.this, "权限异常", Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                    break;
+                default:
+                    Looper.prepare();
+                    Toast.makeText(
+                            UploadPreviewActivity.this, "访问异常", Toast.LENGTH_LONG).show();
                     Looper.loop();
                 }
             }
