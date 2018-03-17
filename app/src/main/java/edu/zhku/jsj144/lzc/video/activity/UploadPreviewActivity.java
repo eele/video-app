@@ -2,38 +2,60 @@ package edu.zhku.jsj144.lzc.video.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
+import com.lzy.okgo.model.Response;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.dialog.CustomProgressDialog;
+import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
 import edu.zhku.jsj144.lzc.video.service.UploadService;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
-import okhttp3.*;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class UploadPreviewActivity extends AppCompatActivity {
 
-    private final MediaType FORM
-            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
     private VideoPlayerIJK ijkPlayer;
     private SeekBar seekBar;
-    private SeekThread seekThread = new SeekThread();
-    private OkHttpClient client = new OkHttpClient();
+    private Timer timer = new Timer();
     private String url = "http://192.168.0.149:8080/video/service/r/videos";
+
+    private CustomProgressDialog dialog;
+
+    private AuthHandler authHandler = new AuthHandler() {
+        @Override
+        public void onLoadingStart() {
+            // 加载提示
+            dialog.show();
+        }
+
+        @Override
+        public void onLoadingEnd() {
+            // 解除加载提示
+            dialog.dismiss();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_preview);
+
+        BaseApplication.getAuthInterceptor().setAuthHandler(authHandler);
+        dialog = new CustomProgressDialog(UploadPreviewActivity.this, R.style.CustomDialog);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.uploadToolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -70,6 +92,8 @@ public class UploadPreviewActivity extends AppCompatActivity {
             this.finish();
         }
 
+        timer.schedule(new SeekTimeTask(), 100);
+
         ijkPlayer = (VideoPlayerIJK) findViewById(R.id.previewVideoView);
         ijkPlayer.setVideoPath(videoPath);
         ijkPlayer.setListener(new VideoPlayerListener() {
@@ -80,7 +104,6 @@ public class UploadPreviewActivity extends AppCompatActivity {
             @Override
             public void onCompletion(IMediaPlayer mp) {
                 mp.seekTo(0);
-                seekThread.setPause();
                 playButton.setImageResource(R.drawable.ic_action_play);
             }
 
@@ -107,11 +130,9 @@ public class UploadPreviewActivity extends AppCompatActivity {
                         if (mp.isPlaying()) {
                             playButton.setImageResource(R.drawable.ic_action_play);
                             mp.pause();
-                            seekThread.setPause();
                         } else {
                             playButton.setImageResource(R.drawable.ic_action_pause);
                             mp.start();
-                            seekThread.setStart();
                         }
                     }
                 });
@@ -141,7 +162,6 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     }
                 });
                 seekBar.setProgress(0);
-                seekThread.start();
                 mp.start();
             }
 
@@ -156,106 +176,57 @@ public class UploadPreviewActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        seekThread.setStop();
+    protected void onPause() {
+        super.onPause();
+        ijkPlayer.stop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
         ijkPlayer.stop();
         IjkMediaPlayer.native_profileEnd();
     }
 
     private void postVideo() {
-        final CustomProgressDialog dialog =
-                new CustomProgressDialog(UploadPreviewActivity.this, R.style.CustomDialog);
-        dialog.show();
+        HttpParams params = new HttpParams();
+        params.put("title", "%E7%A4%BA%E4%BE%8B%E8%A7%86%E9%A2%91");
+        params.put("uid", "c257c5ace0ff4b69bf889c0cb3cb4476");
+        params.put("cid", "qw");
+        params.put("description", "%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E8%A7%86%E9%A2%91");
+        params.put("permission", "0");
+        OkGo.<String>post(url)
+                .params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        try {
+                            // 启动上传服务
+                            Intent startIntent = new Intent(UploadPreviewActivity.this, UploadService.class);
+                            Map<String, Object> vidData = new ObjectMapper().readValue(response.body(), Map.class);
+                            startIntent.putExtra("path", getIntent().getStringExtra("path"));
+                            startIntent.putExtra("vid", (String) vidData.get("id"));
+                            startService(startIntent);
 
-        RequestBody body = RequestBody.create(FORM, "title=%E7%A4%BA%E4%BE%8B%E8%A7%86%E9%A2%91&uid=c257c5ace0ff4b69bf889c0cb3cb4476&cid=qw&description=%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E8%A7%86%E9%A2%91&permission=0");
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                dialog.dismiss();
-                Looper.prepare();
-                Toast.makeText(
-                        UploadPreviewActivity.this,
-                        "连接异常", Toast.LENGTH_LONG).show();
-                Looper.loop();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                dialog.dismiss();
-                switch (response.code()) {
-                case 200:
-                    // 启动上传服务
-                    Intent startIntent = new Intent(UploadPreviewActivity.this, UploadService.class);
-                    Map<String, Object> vidData = new ObjectMapper().readValue(response.body().string(), Map.class);
-                    startIntent.putExtra("path", getIntent().getStringExtra("path"));
-                    startIntent.putExtra("vid", (String) vidData.get("id"));
-                    startService(startIntent);
-
-                    // 打开上传视频列表
-                    UploadPreviewActivity.this.setResult(RESULT_OK, null);
-                    UploadPreviewActivity.this.finish();
-                    Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
-                    startActivity(intent);
-                    break;
-                case 500:
-                    Map<String, Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
-                    Looper.prepare();
-                    Toast.makeText(
-                            UploadPreviewActivity.this, (String) info.get("msg"), Toast.LENGTH_LONG).show();
-                    Looper.loop();
-                    break;
-                case 403:
-                    Looper.prepare();
-                    Toast.makeText(
-                            UploadPreviewActivity.this, "权限异常", Toast.LENGTH_LONG).show();
-                    Looper.loop();
-                    break;
-                default:
-                    Looper.prepare();
-                    Toast.makeText(
-                            UploadPreviewActivity.this, "访问异常", Toast.LENGTH_LONG).show();
-                    Looper.loop();
-                }
-            }
-        });
-
+                            // 打开上传视频列表
+                            UploadPreviewActivity.this.setResult(RESULT_OK, null);
+                            UploadPreviewActivity.this.finish();
+                            Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
+                            startActivity(intent);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
-    private class SeekThread extends Thread {
-
-        private boolean stop = false;
-        private boolean pause = false;
-
-        public void setStop() {
-            stop = true;
-        }
-
-        public void setPause() {
-            pause = true;
-        }
-
-        public void setStart() {
-            pause = false;
-        }
-
-        @Override
+    /**
+     * 进度条定时
+     */
+    private class SeekTimeTask extends TimerTask {
         public void run() {
-            while (stop == false) {
-                try {
-                    if (pause == false) {
-                        seekBar.setProgress((int) ijkPlayer.getCurrentPosition());
-                    }
-                    sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            stop = false;
+            seekBar.setProgress((int) ijkPlayer.getCurrentPosition());
         }
     }
 

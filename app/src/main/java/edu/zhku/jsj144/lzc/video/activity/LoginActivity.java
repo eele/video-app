@@ -2,7 +2,6 @@ package edu.zhku.jsj144.lzc.video.activity;
 
 import android.animation.*;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,17 +13,19 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
+import com.lzy.okgo.model.Response;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.interceptor.JellyInterpolator;
-import okhttp3.*;
+import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final MediaType FORM
-            = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
     private ImageView mClose;
     private TextView mRegBtn;
     private TextView mBtnLogin;
@@ -35,13 +36,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText usernameEditText;
     private EditText passwordEditText;
 
-    private OkHttpClient client = new OkHttpClient();
     private String url = "http://192.168.0.149:8080/video/service/r/sessions";
-
     private String username;
     private String password;
 
     private Handler handler = new Handler() {
+
+        @Override
         public void handleMessage(android.os.Message msg) {
             if (msg.what == 0) {
                 // 恢复显示输入框和登录按钮
@@ -142,12 +143,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      * @param password
      */
     private void authenticate(final String username, final String password) {
-        RequestBody body = RequestBody.create(FORM, "username=" + username + "&password=" + password);
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
+        HttpParams params = new HttpParams();
+        params.put("username", username);
+        params.put("password", password);
+        OkGo.<String>post(url)
+                .params(params)
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        Map<String, Object> info = null;
+                        try {
+                            info = new ObjectMapper().readValue(response.body(), Map.class);
+                            if (info.get("stateMsg").equals("OK")) {
+                                // 保存用户名、密码和令牌
+                                SharedPreferencesUtil.putString(LoginActivity.this, "username", username);
+                                SharedPreferencesUtil.putString(LoginActivity.this, "password", password);
+                                SharedPreferencesUtil.putString(LoginActivity.this, "token", (String) info.get("token"));
+                                // 关闭登录界面
+                                LoginActivity.this.finish();
+                            } else {
+                                handler.sendEmptyMessage(0); // 恢复显示输入框和登录按钮
+
+                                Toast.makeText(LoginActivity.this,
+                                        (String) info.get("stateMsg"), Toast.LENGTH_LONG).show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+
+        /*client.newCall(request).enqueue(new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
@@ -164,17 +192,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onResponse(Call call, Response response) throws IOException {
                 Map<String, Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
                 if (info.get("stateMsg").equals("OK")) {
-                    // 获取SharedPreferences对象
-                    SharedPreferences sharedPre =
-                            LoginActivity.this.getSharedPreferences("config", LoginActivity.this.MODE_PRIVATE);
-                    // 获取Editor对象
-                    SharedPreferences.Editor editor = sharedPre.edit();
                     // 保存用户名、密码和令牌
-                    editor.putString("username", username);
-                    editor.putString("password", password);
-                    editor.putString("token", (String) info.get("token"));
-                    // 提交保存
-                    editor.commit();
+                    SharedPreferencesUtil.putString(LoginActivity.this, "username", username);
+                    SharedPreferencesUtil.putString(LoginActivity.this, "password", password);
+                    SharedPreferencesUtil.putString(LoginActivity.this, "token", (String) info.get("token"));
                     // 关闭登录界面
                     LoginActivity.this.finish();
                 } else {
@@ -186,7 +207,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Looper.loop();
                 }
             }
-        });
+        });*/
     }
 
     /**
