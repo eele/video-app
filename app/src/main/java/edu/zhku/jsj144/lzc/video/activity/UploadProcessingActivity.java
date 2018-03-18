@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Toast;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.service.UploadService;
+import edu.zhku.jsj144.lzc.video.util.WebUtil;
 import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
 import okhttp3.*;
 
@@ -17,6 +20,8 @@ import java.io.IOException;
 import java.util.Map;
 
 public class UploadProcessingActivity extends InterceptorActivity {
+
+    private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +36,15 @@ public class UploadProcessingActivity extends InterceptorActivity {
             }
         });
 
+        webView = (WebView) findViewById(R.id.uploadWebview);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new WebUtil(UploadProcessingActivity.this), "android");
+        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myvideo");
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.exit(0);
+    }
 }

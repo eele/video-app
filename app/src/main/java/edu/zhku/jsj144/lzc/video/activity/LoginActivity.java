@@ -156,9 +156,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         try {
                             info = new ObjectMapper().readValue(response.body(), Map.class);
                             if (info.get("stateMsg").equals("OK")) {
-                                // 保存用户名、密码和令牌
-                                SharedPreferencesUtil.putString(LoginActivity.this, "username", username);
-                                SharedPreferencesUtil.putString(LoginActivity.this, "password", password);
+                                // 保存用户ID和令牌
+                                SharedPreferencesUtil.putString(LoginActivity.this, "uid", (String) info.get("uid"));
                                 SharedPreferencesUtil.putString(LoginActivity.this, "token", (String) info.get("token"));
                                 // 关闭登录界面
                                 LoginActivity.this.finish();
@@ -173,41 +172,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         }
                     }
                 });
-
-
-        /*client.newCall(request).enqueue(new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                handler.sendEmptyMessage(0); // 恢复显示输入框和登录按钮
-
-                Looper.prepare();
-                Toast.makeText(
-                        LoginActivity.this,
-                        "连接异常", Toast.LENGTH_LONG).show();
-                Looper.loop();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Map<String, Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
-                if (info.get("stateMsg").equals("OK")) {
-                    // 保存用户名、密码和令牌
-                    SharedPreferencesUtil.putString(LoginActivity.this, "username", username);
-                    SharedPreferencesUtil.putString(LoginActivity.this, "password", password);
-                    SharedPreferencesUtil.putString(LoginActivity.this, "token", (String) info.get("token"));
-                    // 关闭登录界面
-                    LoginActivity.this.finish();
-                } else {
-                    handler.sendEmptyMessage(0); // 恢复显示输入框和登录按钮
-
-                    Looper.prepare();
-                    Toast.makeText(LoginActivity.this,
-                            (String) info.get("stateMsg"), Toast.LENGTH_LONG).show();
-                    Looper.loop();
-                }
-            }
-        });*/
     }
 
     /**

@@ -33,7 +33,7 @@ public class AuthInterceptor implements Interceptor {
         // 将令牌添加到请求头
         Request request = chain.request().newBuilder()
                 .addHeader("Auth-Token", SharedPreferencesUtil.getString(BaseApplication.getContext(),
-                        "token", null))
+                        "token", ""))
                 .build();
         Response response = null;
         try {

@@ -9,13 +9,17 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.Button;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.activity.UploadChoiceActivity;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
+import edu.zhku.jsj144.lzc.video.util.WebUtil;
 
 public class MinePageFragment extends Fragment {
 
     private Activity activity;
+    private WebView webView;
 
     public void setActivity(Activity activity) {
         this.activity = activity;
@@ -36,6 +40,11 @@ public class MinePageFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        webView = (WebView) rootView.findViewById(R.id.mineWebView);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new WebUtil(activity), "android");
+        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/mine");
         return rootView;
     }
 

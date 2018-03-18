@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 
 public class DiscoverPageFragment extends Fragment {
 
@@ -26,7 +27,7 @@ public class DiscoverPageFragment extends Fragment {
 
         webView = (WebView) rootView.findViewById(R.id.discoverWebview);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("http://192.168.0.149:8080/myvideo");
+        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/discover");
 
 //        rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
 //            @Override

@@ -15,6 +15,7 @@ import java.util.Map;
 public abstract class AuthHandler extends Handler {
 
     private Response response;
+    private Intent intent = new Intent(BaseApplication.getContext(), LoginActivity.class);
 
     public abstract void onLoadingStart();
 
@@ -22,7 +23,6 @@ public abstract class AuthHandler extends Handler {
 
     public void onTokenError() {
         // 要求重新登录
-        Intent intent = new Intent(BaseApplication.getContext(), LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         BaseApplication.getContext().startActivity(intent);
     }

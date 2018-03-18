@@ -2,16 +2,23 @@ package edu.zhku.jsj144.lzc.video.application;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheEntity;
 import com.lzy.okgo.cache.CacheMode;
 import edu.zhku.jsj144.lzc.video.interceptor.AuthInterceptor;
+import edu.zhku.jsj144.lzc.video.service.UploadService;
 import okhttp3.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
 
 public class BaseApplication extends Application {
     private static Context context;
+    private static Intent uploadIntent;
+    public static final String REST_BASE_URL = "http://192.168.0.149:8080/video/service/r";
+    public static final String UPLOAD_BASE_IP = "192.168.0.149";
+    public static final String PLAY_BASE_URL = "http://192.168.0.149";
+    public static final String PAGE_BASE_URL = "http://192.168.0.149:8081";
 
     // 全局认证拦截器
     private static AuthInterceptor authInterceptor = new AuthInterceptor();
@@ -24,6 +31,7 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
+        uploadIntent = new Intent(context, UploadService.class);
 
         // 初始化网络请求
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -45,5 +53,9 @@ public class BaseApplication extends Application {
 
     public static Context getContext(){
         return  context;
+    }
+
+    public static Intent getUploadIntent() {
+        return uploadIntent;
     }
 }

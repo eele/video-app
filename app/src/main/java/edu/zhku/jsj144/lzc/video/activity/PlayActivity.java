@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.MediaController;
 import android.widget.VideoView;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -29,7 +30,7 @@ public class PlayActivity extends AppCompatActivity {
         });
 
         videoView = (VideoView) findViewById(R.id.videoView);
-        String uri = "http://192.168.0.149/a/VID_20180226_210856.mp4";
+        String uri = BaseApplication.PLAY_BASE_URL + "/a/VID_20180226_210856.mp4";
         videoView.setVideoURI(Uri.parse(uri));
         videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {

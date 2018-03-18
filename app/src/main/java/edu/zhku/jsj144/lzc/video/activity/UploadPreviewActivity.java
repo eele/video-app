@@ -16,6 +16,7 @@ import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.dialog.CustomProgressDialog;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
 import edu.zhku.jsj144.lzc.video.service.UploadService;
+import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -31,7 +32,7 @@ public class UploadPreviewActivity extends AppCompatActivity {
     private VideoPlayerIJK ijkPlayer;
     private SeekBar seekBar;
     private Timer timer = new Timer();
-    private String url = "http://192.168.0.149:8080/video/service/r/videos";
+    private String url = BaseApplication.REST_BASE_URL + "/videos";
 
     private CustomProgressDialog dialog;
 
@@ -191,10 +192,10 @@ public class UploadPreviewActivity extends AppCompatActivity {
 
     private void postVideo() {
         HttpParams params = new HttpParams();
-        params.put("title", "%E7%A4%BA%E4%BE%8B%E8%A7%86%E9%A2%91");
-        params.put("uid", "c257c5ace0ff4b69bf889c0cb3cb4476");
+        params.put("title", "视频题目");
+        params.put("uid", "02059350d52346a0940a4eeece3462c6");
         params.put("cid", "qw");
-        params.put("description", "%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E8%A7%86%E9%A2%91");
+        params.put("description", "视频描述");
         params.put("permission", "0");
         OkGo.<String>post(url)
                 .params(params)
@@ -203,11 +204,14 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     public void onSuccess(Response<String> response) {
                         try {
                             // 启动上传服务
-                            Intent startIntent = new Intent(UploadPreviewActivity.this, UploadService.class);
                             Map<String, Object> vidData = new ObjectMapper().readValue(response.body(), Map.class);
-                            startIntent.putExtra("path", getIntent().getStringExtra("path"));
-                            startIntent.putExtra("vid", (String) vidData.get("id"));
-                            startService(startIntent);
+                            BaseApplication.getUploadIntent().putExtra("path", getIntent().getStringExtra("path"));
+                            BaseApplication.getUploadIntent().putExtra("vid", (String) vidData.get("id"));
+                            SharedPreferencesUtil.putString(
+                                    UploadPreviewActivity.this,
+                                    "vid" + (String) vidData.get("id"),
+                                    getIntent().getStringExtra("path"));
+                            startService(BaseApplication.getUploadIntent());
 
                             // 打开上传视频列表
                             UploadPreviewActivity.this.setResult(RESULT_OK, null);

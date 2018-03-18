@@ -38,6 +38,7 @@
         </activity>
         <activity
                 android:name=".activity.UploadProcessingActivity"
+                android:process=":uploadProcessing"
                 android:screenOrientation="portrait">
         </activity>
         <activity

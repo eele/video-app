@@ -1,5 +1,6 @@
 package edu.zhku.jsj144.lzc.video.util.uploadUtil;
 
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -42,7 +43,7 @@ public class UploadClient {
 
 			});
 
-			ChannelFuture channelFuture = bootstrap.connect("192.168.0.149", 8086).sync();
+			ChannelFuture channelFuture = bootstrap.connect(BaseApplication.UPLOAD_BASE_IP, 8086).sync();
 			channelFuture.channel().closeFuture().sync();
 		} finally {
 			eventLoopGroup.shutdownGracefully();
