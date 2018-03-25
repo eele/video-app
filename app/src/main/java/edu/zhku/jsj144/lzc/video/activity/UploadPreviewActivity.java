@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -15,7 +18,6 @@ import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.dialog.CustomProgressDialog;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
-import edu.zhku.jsj144.lzc.video.service.UploadService;
 import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
@@ -23,6 +25,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -93,7 +96,7 @@ public class UploadPreviewActivity extends AppCompatActivity {
             this.finish();
         }
 
-        timer.schedule(new SeekTimeTask(), 100);
+        timer.schedule(new SeekTimeTask(), new Date(), 100);
 
         ijkPlayer = (VideoPlayerIJK) findViewById(R.id.previewVideoView);
         ijkPlayer.setVideoPath(videoPath);
@@ -205,18 +208,20 @@ public class UploadPreviewActivity extends AppCompatActivity {
                         try {
                             // 启动上传服务
                             Map<String, Object> vidData = new ObjectMapper().readValue(response.body(), Map.class);
-                            BaseApplication.getUploadIntent().putExtra("path", getIntent().getStringExtra("path"));
-                            BaseApplication.getUploadIntent().putExtra("vid", (String) vidData.get("id"));
                             SharedPreferencesUtil.putString(
                                     UploadPreviewActivity.this,
                                     "vid" + (String) vidData.get("id"),
                                     getIntent().getStringExtra("path"));
+                            BaseApplication.getUploadIntent()
+                                    .putExtra("path", getIntent().getStringExtra("path"));
+                            BaseApplication.getUploadIntent().putExtra("vid", (String) vidData.get("id"));
                             startService(BaseApplication.getUploadIntent());
 
                             // 打开上传视频列表
                             UploadPreviewActivity.this.setResult(RESULT_OK, null);
                             UploadPreviewActivity.this.finish();
                             Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
+                            intent.putExtra("startUpload", (String) vidData.get("id"));
                             startActivity(intent);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -230,7 +235,9 @@ public class UploadPreviewActivity extends AppCompatActivity {
      */
     private class SeekTimeTask extends TimerTask {
         public void run() {
-            seekBar.setProgress((int) ijkPlayer.getCurrentPosition());
+            if (ijkPlayer != null) {
+                seekBar.setProgress((int) ijkPlayer.getCurrentPosition());
+            }
         }
     }
 

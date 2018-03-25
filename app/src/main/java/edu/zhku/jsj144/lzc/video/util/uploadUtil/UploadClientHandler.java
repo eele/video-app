@@ -26,8 +26,8 @@ public class UploadClientHandler extends SimpleChannelInboundHandler<String> {
 		try {
 			raf = new RandomAccessFile(localFilepath, "r");
 			totalLength = raf.length();
-			ctx.writeAndFlush(
-			        new ChunkedFile(raf, info.getFinishedSize(), totalLength - info.getFinishedSize(), 8192));
+            UploadClient.chunkedFile = new ChunkedFile(raf, info.getFinishedSize(), totalLength - info.getFinishedSize(), 8192);
+			ctx.writeAndFlush(UploadClient.chunkedFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

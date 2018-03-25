@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
+import edu.zhku.jsj144.lzc.video.util.WebUtil;
 
 public class DiscoverPageFragment extends Fragment {
 
@@ -26,16 +27,10 @@ public class DiscoverPageFragment extends Fragment {
                 R.layout.fragment_page_discover, container, false);
 
         webView = (WebView) rootView.findViewById(R.id.discoverWebview);
+        webView.addJavascriptInterface(new WebUtil(activity), "android");
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/discover");
 
-//        rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(activity, PlayActivity.class);
-//                startActivity(intent);
-//            }
-//        });
         return rootView;
     }
 

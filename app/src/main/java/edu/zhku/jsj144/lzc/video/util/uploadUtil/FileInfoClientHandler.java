@@ -3,6 +3,7 @@ package edu.zhku.jsj144.lzc.video.util.uploadUtil;
 import android.util.Log;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.stream.ChunkedFile;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 import java.io.File;
@@ -14,7 +15,7 @@ public class FileInfoClientHandler extends SimpleChannelInboundHandler<Info> {
     private String localFilepath;
     private String vid;
 
-	public FileInfoClientHandler(String uid, String localFilepath, String vid) {
+	public FileInfoClientHandler(String uid, String localFilepath, String vide) {
 		this.uid = uid;
         this.localFilepath = localFilepath;
         this.vid = vid;

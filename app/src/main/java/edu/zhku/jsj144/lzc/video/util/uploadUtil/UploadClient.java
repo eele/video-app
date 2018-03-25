@@ -11,6 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.stream.ChunkedFile;
 
 /**
  * 上传组件
@@ -18,6 +19,7 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 public class UploadClient {
 
     private static String uid = null;
+	protected static ChunkedFile chunkedFile;
 
     public static void setUid(String uid) {
         UploadClient.uid = uid;
@@ -49,4 +51,17 @@ public class UploadClient {
 			eventLoopGroup.shutdownGracefully();
 		}
 	}
+
+    /**
+     * 获取上传进度
+     * @return
+     */
+    public static long getUploadProgress() {
+        if (chunkedFile == null) {
+            return 0;
+        } else {
+            return (long) (chunkedFile.currentOffset() * 1.0 / chunkedFile.length() * 100);
+        }
+    }
+
 }
