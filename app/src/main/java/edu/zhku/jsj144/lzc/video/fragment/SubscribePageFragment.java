@@ -3,15 +3,15 @@ package edu.zhku.jsj144.lzc.video.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import edu.zhku.jsj144.lzc.video.R;
-import edu.zhku.jsj144.lzc.video.util.StatusBar;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
+import edu.zhku.jsj144.lzc.video.util.WebUtil;
 
-public class FollowPageFragment extends Fragment {
+public class SubscribePageFragment extends Fragment {
 
     private Activity activity;
     private WebView webView;
@@ -24,11 +24,12 @@ public class FollowPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_page_follow, container, false);
+                R.layout.fragment_page_subscribe, container, false);
 
-        webView = (WebView) rootView.findViewById(R.id.followWebview);
+        webView = (WebView) rootView.findViewById(R.id.subscribeWebview);
+        webView.addJavascriptInterface(new WebUtil(activity), "android");
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("http://demo.getvum.com");
+        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/subscribe?r=all");
 
         return rootView;
     }

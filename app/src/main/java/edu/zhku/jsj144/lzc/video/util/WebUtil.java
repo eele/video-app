@@ -13,8 +13,7 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
-import edu.zhku.jsj144.lzc.video.activity.PlayActivity;
-import edu.zhku.jsj144.lzc.video.activity.UploadProcessingActivity;
+import edu.zhku.jsj144.lzc.video.activity.*;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
 import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
@@ -71,8 +70,38 @@ public class WebUtil {
 
     @JavascriptInterface
     public void openMyVideo() {
+        if (!hasLogin()) {
+            return;
+        }
         Intent intent = new Intent(context, UploadProcessingActivity.class);
         intent.putExtra("startUpload", "0");
+        context.startActivity(intent);
+    }
+
+    @JavascriptInterface
+    public void openMyFavorite() {
+        if (!hasLogin()) {
+            return;
+        }
+        Intent intent = new Intent(context, FavoritesActivity.class);
+        context.startActivity(intent);
+    }
+
+    @JavascriptInterface
+    public void openMySubscribe() {
+        if (!hasLogin()) {
+            return;
+        }
+        Intent intent = new Intent(context, SubscribeActivity.class);
+        context.startActivity(intent);
+    }
+
+    @JavascriptInterface
+    public void openMyHistory() {
+        if (!hasLogin()) {
+            return;
+        }
+        Intent intent = new Intent(context, HistoryActivity.class);
         context.startActivity(intent);
     }
 
@@ -112,5 +141,46 @@ public class WebUtil {
         new AlertDialog.Builder(context).setTitle("评论该视频").setIcon(
                 android.R.drawable.ic_dialog_info).setView(editText).setPositiveButton("发表", listener)
                 .setNegativeButton("取消", null).show();
+    }
+
+    @JavascriptInterface
+    public void setCollect(String vid) {
+        HttpParams params = new HttpParams();
+        params.put("uid", SharedPreferencesUtil.getString(context, "uid", "null"));
+        params.put("vid", vid);
+        OkGo.<String>post(BaseApplication.REST_BASE_URL + "/favorites")
+                .params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        webView.loadUrl("javascript:getFavoriteID()");
+                    }
+                });
+    }
+
+    @JavascriptInterface
+    public void setUnCollect(String fid) {
+        HttpParams params = new HttpParams();
+        OkGo.<String>delete(BaseApplication.REST_BASE_URL + "/favorites/" + fid)
+                .params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        webView.loadUrl("javascript:getFavoriteID()");
+                    }
+                });
+    }
+
+    private boolean hasLogin() {
+        String uid = SharedPreferencesUtil.getString(context, "uid", "");
+        String token = SharedPreferencesUtil.getString(context, "token", "");
+        if (uid.equals("") || token.equals("")) {
+            // 要求重新登录
+            Intent intent = new Intent(context, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            BaseApplication.getContext().startActivity(intent);
+            return false;
+        }
+        return true;
     }
 }

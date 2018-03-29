@@ -1,6 +1,5 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -12,7 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.fragment.DiscoverPageFragment;
-import edu.zhku.jsj144.lzc.video.fragment.FollowPageFragment;
+import edu.zhku.jsj144.lzc.video.fragment.SubscribePageFragment;
 import edu.zhku.jsj144.lzc.video.fragment.MinePageFragment;
 import edu.zhku.jsj144.lzc.video.viewpager.NoScrollViewPager;
 
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     ((DiscoverPageFragment) fragment).setActivity(MainActivity.this);
                     break;
                 case 1:
-                    fragment = new FollowPageFragment();
+                    fragment = new SubscribePageFragment();
                     break;
                 case 2:
                     fragment = new MinePageFragment();

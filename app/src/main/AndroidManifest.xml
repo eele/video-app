@@ -42,6 +42,21 @@
                 android:screenOrientation="portrait">
         </activity>
         <activity
+                android:name=".activity.FavoritesActivity"
+                android:process=":favorites"
+                android:screenOrientation="portrait">
+        </activity>
+        <activity
+                android:name=".activity.SubscribeActivity"
+                android:process=":subscribe"
+                android:screenOrientation="portrait">
+        </activity>
+        <activity
+                android:name=".activity.HistoryActivity"
+                android:process=":history"
+                android:screenOrientation="portrait">
+        </activity>
+        <activity
                 android:name=".activity.PlayActivity"
                 android:hardwareAccelerated="true"
                 android:screenOrientation="portrait"

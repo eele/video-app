@@ -46,7 +46,7 @@ public class AuthInterceptor implements Interceptor {
             throw new IOException();
         }
 
-        if (response.code() != 200) {
+        if (response.code() != 200 && response.code() != 204) {
             // 若服务端返回令牌无效信息
             if (response.code() == 403 && response.body().string().contains("TOKENERR")) {
                 if (authHandler != null) {
