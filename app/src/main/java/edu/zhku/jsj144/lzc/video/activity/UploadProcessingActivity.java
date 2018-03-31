@@ -36,10 +36,10 @@ public class UploadProcessingActivity extends InterceptorActivity {
             }
         });
 
-        webView = (WebView) findViewById(R.id.uploadWebview);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new WebUtil(UploadProcessingActivity.this), "android");
-        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myvideo?startUpload=" + getIntent().getStringExtra("startUpload"));
+//        webView = (WebView) findViewById(R.id.uploadWebview);
+//        webView.getSettings().setJavaScriptEnabled(true);
+//        webView.addJavascriptInterface(new WebUtil(UploadProcessingActivity.this), "android");
+//        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myvideo?startUpload=" + getIntent().getStringExtra("startUpload"));
     }
 
     @Override

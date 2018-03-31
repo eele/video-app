@@ -9,8 +9,14 @@
             android:layout_width="match_parent"
             android:layout_height="130dp">
 
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" app:srcCompat="@drawable/ic_action_setting"
+                android:layout_marginLeft="100dp"
+                android:id="@+id/setting" android:layout_alignTop="@+id/headView" android:layout_alignParentEnd="true"
+                android:layout_marginEnd="42dp"/>
         <TextView
-                android:text="UserName"
+                android:text="登录/注册"
                 android:layout_marginLeft="120dp"
                 android:layout_marginTop="50dp"
                 android:layout_marginRight="50dp"
@@ -18,7 +24,7 @@
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/username"/>
+                android:layout_height="wrap_content" android:id="@+id/usernameView"/>
         <ImageView
                 android:layout_marginLeft="25dp"
                 android:layout_marginTop="30dp"

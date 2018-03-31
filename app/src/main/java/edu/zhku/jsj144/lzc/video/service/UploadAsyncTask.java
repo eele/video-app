@@ -17,6 +17,7 @@ public class UploadAsyncTask extends AsyncTask {
     public UploadAsyncTask(String videoPath, String vid) {
         this.videoPath = videoPath;
         this.vid = vid;
+
     }
 
     @Override

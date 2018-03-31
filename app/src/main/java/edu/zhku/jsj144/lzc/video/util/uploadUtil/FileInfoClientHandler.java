@@ -15,7 +15,7 @@ public class FileInfoClientHandler extends SimpleChannelInboundHandler<Info> {
     private String localFilepath;
     private String vid;
 
-	public FileInfoClientHandler(String uid, String localFilepath, String vide) {
+	public FileInfoClientHandler(String uid, String localFilepath, String vid) {
 		this.uid = uid;
         this.localFilepath = localFilepath;
         this.vid = vid;

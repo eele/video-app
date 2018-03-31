@@ -3,12 +3,13 @@ package edu.zhku.jsj144.lzc.video.util;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
@@ -17,6 +18,10 @@ import edu.zhku.jsj144.lzc.video.activity.*;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
 import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WebUtil {
 
@@ -84,6 +89,13 @@ public class WebUtil {
             return;
         }
         Intent intent = new Intent(context, FavoritesActivity.class);
+        context.startActivity(intent);
+    }
+
+    @JavascriptInterface
+    public void openUserVideoList(String uid) {
+        Intent intent = new Intent(context, UserVideosActivity.class);
+        intent.putExtra("uid", uid);
         context.startActivity(intent);
     }
 
@@ -169,6 +181,35 @@ public class WebUtil {
                         webView.loadUrl("javascript:getFavoriteID()");
                     }
                 });
+    }
+
+    @JavascriptInterface
+    public String getHistoryVid(int start, int size) throws IOException {
+        String vidJson = "[]";
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/history");
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        try {
+            List<String> vidList = new ArrayList<String>();
+            int line = 0;
+            String vid = br.readLine();
+            while (vid != null) {
+                if (line >= start) {
+                    vidList.add(vid);
+                }
+                line++;
+                if (line > start + size) {
+                    break;
+                }
+                vid = br.readLine();
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            vidJson = mapper.writeValueAsString(vidList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            br.close();
+        }
+        return vidJson;
     }
 
     private boolean hasLogin() {

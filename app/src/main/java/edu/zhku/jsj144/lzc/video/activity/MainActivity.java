@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 1:
                     fragment = new SubscribePageFragment();
+                    ((SubscribePageFragment) fragment).setActivity(MainActivity.this);
                     break;
                 case 2:
                     fragment = new MinePageFragment();

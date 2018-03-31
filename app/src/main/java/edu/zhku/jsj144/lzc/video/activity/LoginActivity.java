@@ -2,9 +2,9 @@ package edu.zhku.jsj144.lzc.video.activity;
 
 import android.animation.*;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +19,7 @@ import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.interceptor.JellyInterpolator;
+import edu.zhku.jsj144.lzc.video.util.MD5Util;
 import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 
 import java.io.IOException;
@@ -132,7 +133,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         // 点击注册按钮
         if (v == mRegBtn) {
-
+            Intent intent = new Intent(LoginActivity.this, RegActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -145,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void authenticate(final String username, final String password) {
         HttpParams params = new HttpParams();
         params.put("username", username);
-        params.put("password", password);
+        params.put("password", MD5Util.md5Password(password));
         OkGo.<String>post(url)
                 .params(params)
                 .execute(new StringCallback() {

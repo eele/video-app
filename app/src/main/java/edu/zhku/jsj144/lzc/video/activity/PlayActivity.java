@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -19,6 +20,8 @@ import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.util.UnitUtil;
 import edu.zhku.jsj144.lzc.video.util.WebUtil;
+
+import java.io.*;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -37,6 +40,12 @@ public class PlayActivity extends AppCompatActivity {
                 PlayActivity.this.finish();
             }
         });
+
+        try {
+            addPlayHistory();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         final View mBottomLayout = findViewById(R.id.media_controller);
         final View mVideoLayout = findViewById(R.id.video_layout);
@@ -106,5 +115,34 @@ public class PlayActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mVideoView.start();//播放视频
+    }
+
+    private void addPlayHistory() throws IOException {
+        String addingVid = getIntent().getStringExtra("vid");
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/history");
+        if (! file.getParentFile().exists()) {
+            file.getParentFile().mkdir();
+        }
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true)));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        try {
+            String vid = br.readLine();
+            while (vid != null) {
+                if (vid.equals(addingVid)) {
+                    addingVid = null;
+                    break;
+                }
+                vid = br.readLine();
+            }
+            if (addingVid != null) {
+                bw.write(addingVid);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            bw.close();
+            br.close();
+        }
     }
 }

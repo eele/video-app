@@ -57,10 +57,15 @@
                 android:screenOrientation="portrait">
         </activity>
         <activity
+                android:name=".activity.UserVideosActivity"
+                android:process=":userVideos"
+                android:screenOrientation="portrait">
+        </activity>
+        <activity
                 android:name=".activity.PlayActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize"
                 android:hardwareAccelerated="true"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation|keyboardHidden|screenSize">
+                android:screenOrientation="portrait">
         </activity>
         <activity android:name=".activity.InterceptorActivity">
         </activity>
@@ -73,6 +78,8 @@
         </service>
 
         <activity android:name=".activity.LoginActivity">
+        </activity>
+        <activity android:name=".activity.RegActivity">
         </activity>
     </application>
 
