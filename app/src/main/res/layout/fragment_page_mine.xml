@@ -13,7 +13,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" app:srcCompat="@drawable/ic_action_setting"
                 android:layout_marginLeft="100dp"
-                android:id="@+id/setting" android:layout_alignTop="@+id/headView" android:layout_alignParentEnd="true"
+                android:id="@+id/setting" android:layout_alignTop="@+id/portrait" android:layout_alignParentEnd="true"
                 android:layout_marginEnd="42dp"/>
         <TextView
                 android:text="登录/注册"
@@ -29,7 +29,7 @@
                 android:layout_marginLeft="25dp"
                 android:layout_marginTop="30dp"
                 android:layout_width="80dp"
-                android:layout_height="80dp" app:srcCompat="@drawable/border" android:id="@+id/headView"/>
+                android:layout_height="80dp" app:srcCompat="@drawable/border" android:id="@+id/portrait"/>
     </RelativeLayout>
     <LinearLayout
             android:layout_width="match_parent"
