@@ -14,7 +14,7 @@
                 android:queryHint="搜搜看"
                 android:focusable="false"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" android:id="@+id/search1"/>
     </android.support.v7.widget.Toolbar>
 
     <WebView
