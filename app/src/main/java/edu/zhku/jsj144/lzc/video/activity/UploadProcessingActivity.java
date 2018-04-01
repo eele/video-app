@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.service.UploadService;
+import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 import edu.zhku.jsj144.lzc.video.util.WebUtil;
 import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
 import okhttp3.*;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class UploadProcessingActivity extends InterceptorActivity {
 
     private WebView webView;
+    private WebUtil webUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +38,17 @@ public class UploadProcessingActivity extends InterceptorActivity {
             }
         });
 
-//        webView = (WebView) findViewById(R.id.uploadWebview);
-//        webView.getSettings().setJavaScriptEnabled(true);
-//        webView.addJavascriptInterface(new WebUtil(UploadProcessingActivity.this), "android");
-//        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myvideo?startUpload=" + getIntent().getStringExtra("startUpload"));
+        webUtil = new WebUtil(UploadProcessingActivity.this);
+        webView = (WebView) findViewById(R.id.uploadWebview);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(webUtil, "android");
+        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myvideos?uploadingVideoID=" + getIntent().getStringExtra("uploadingVideoID"));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        webUtil.pauseUpload(getIntent().getStringExtra("uploadingVideoID"), UploadClient.getUploadProgress() + "");
     }
 
     @Override

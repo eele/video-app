@@ -60,7 +60,7 @@ public class UploadClient {
         if (chunkedFile == null) {
             return 0;
         } else {
-            return (long) (chunkedFile.currentOffset() * 1.0 / chunkedFile.length() * 100);
+            return (long) (chunkedFile.progress() * 1.0 / chunkedFile.length() * 100);
         }
     }
 

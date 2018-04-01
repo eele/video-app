@@ -10,6 +10,8 @@ import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
 
 public class UploadService extends Service {
 
+    private UploadAsyncTask asyncTask;
+
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
@@ -21,7 +23,7 @@ public class UploadService extends Service {
         String videoPath = intent.getStringExtra("path");
         String vid = intent.getStringExtra("vid");
         UploadClient.setUid(SharedPreferencesUtil.getString(this, "uid", "null"));
-        UploadAsyncTask asyncTask = new UploadAsyncTask(videoPath,vid);
+        asyncTask = new UploadAsyncTask(videoPath,vid);
         asyncTask.execute();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -29,6 +31,6 @@ public class UploadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.exit(0);
+        asyncTask.cancel(true);
     }
 }

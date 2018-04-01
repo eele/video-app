@@ -43,13 +43,18 @@ public class UploadPreviewActivity extends AppCompatActivity {
         @Override
         public void onLoadingStart() {
             // 加载提示
-            dialog.show();
+            if (dialog != null) {
+                dialog.show();
+            }
         }
 
         @Override
         public void onLoadingEnd() {
             // 解除加载提示
-            dialog.dismiss();
+            if (dialog != null) {
+                dialog.dismiss();
+                dialog = null;
+            }
         }
     };
 
@@ -196,7 +201,7 @@ public class UploadPreviewActivity extends AppCompatActivity {
     private void postVideo() {
         HttpParams params = new HttpParams();
         params.put("title", "视频题目");
-        params.put("uid", "02059350d52346a0940a4eeece3462c6");
+        params.put("uid", SharedPreferencesUtil.getString(this, "uid", ""));
         params.put("cid", "qw");
         params.put("description", "视频描述");
         params.put("permission", "0");
@@ -206,22 +211,18 @@ public class UploadPreviewActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Response<String> response) {
                         try {
-                            // 启动上传服务
+                            // 设置上传信息
                             Map<String, Object> vidData = new ObjectMapper().readValue(response.body(), Map.class);
                             SharedPreferencesUtil.putString(
                                     UploadPreviewActivity.this,
                                     "vid" + (String) vidData.get("id"),
                                     getIntent().getStringExtra("path"));
-                            BaseApplication.getUploadIntent()
-                                    .putExtra("path", getIntent().getStringExtra("path"));
-                            BaseApplication.getUploadIntent().putExtra("vid", (String) vidData.get("id"));
-                            startService(BaseApplication.getUploadIntent());
 
                             // 打开上传视频列表
                             UploadPreviewActivity.this.setResult(RESULT_OK, null);
                             UploadPreviewActivity.this.finish();
                             Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
-                            intent.putExtra("startUpload", (String) vidData.get("id"));
+                            intent.putExtra("uploadingVideoID", (String) vidData.get("id"));
                             startActivity(intent);
                         } catch (IOException e) {
                             e.printStackTrace();

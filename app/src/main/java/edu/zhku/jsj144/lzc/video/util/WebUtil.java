@@ -61,8 +61,9 @@ public class WebUtil {
     }
 
     @JavascriptInterface
-    public void pauseUpload() {
+    public void pauseUpload(String vid, String progress) {
         context.stopService(BaseApplication.getUploadIntent());
+        SharedPreferencesUtil.putString(context, "p-" + vid, progress);
     }
 
     @JavascriptInterface
@@ -79,7 +80,7 @@ public class WebUtil {
             return;
         }
         Intent intent = new Intent(context, UploadProcessingActivity.class);
-        intent.putExtra("startUpload", "0");
+        intent.putExtra("uploadingVideoID", "0");
         context.startActivity(intent);
     }
 
@@ -120,6 +121,17 @@ public class WebUtil {
     @JavascriptInterface
     public long getUploadProgress() {
         return UploadClient.getUploadProgress();
+    }
+
+    @JavascriptInterface
+    public int getSavedUploadProgress(String vid) {
+        return Integer.parseInt(SharedPreferencesUtil.getString(context, "p-" + vid, "0"));
+    }
+
+    @JavascriptInterface
+    public void removeSavedUploadProgress(String vid) {
+        SharedPreferencesUtil.remove(context, "p-" + vid);
+        context.stopService(BaseApplication.getUploadIntent());
     }
 
     @JavascriptInterface
