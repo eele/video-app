@@ -27,7 +27,7 @@ public class HistoryActivity extends InterceptorActivity {
 
         webView = (WebView) findViewById(R.id.historyWebview);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new WebUtil(HistoryActivity.this), "android");
+        webView.addJavascriptInterface(new WebUtil(HistoryActivity.this, webView), "android");
         webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myhistory");
     }
 
@@ -36,4 +36,5 @@ public class HistoryActivity extends InterceptorActivity {
         super.onDestroy();
         System.exit(0);
     }
+
 }

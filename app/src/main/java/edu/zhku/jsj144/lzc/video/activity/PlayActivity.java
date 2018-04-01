@@ -18,6 +18,7 @@ import com.universalvideoview.UniversalMediaController;
 import com.universalvideoview.UniversalVideoView;
 import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
+import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 import edu.zhku.jsj144.lzc.video.util.UnitUtil;
 import edu.zhku.jsj144.lzc.video.util.WebUtil;
 
@@ -119,7 +120,8 @@ public class PlayActivity extends AppCompatActivity {
 
     private void addPlayHistory() throws IOException {
         String addingVid = getIntent().getStringExtra("vid");
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/history");
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/"
+                + SharedPreferencesUtil.getString(PlayActivity.this, "uid", ""));
         if (! file.getParentFile().exists()) {
             file.getParentFile().mkdir();
         }

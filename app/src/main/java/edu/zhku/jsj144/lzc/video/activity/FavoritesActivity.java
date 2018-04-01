@@ -1,5 +1,6 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -27,7 +28,7 @@ public class FavoritesActivity extends InterceptorActivity {
 
         webView = (WebView) findViewById(R.id.favoriteWebview);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new WebUtil(FavoritesActivity.this), "android");
+        webView.addJavascriptInterface(new WebUtil(FavoritesActivity.this, webView), "android");
         webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myfavorites");
     }
 
@@ -35,5 +36,11 @@ public class FavoritesActivity extends InterceptorActivity {
     protected void onDestroy() {
         super.onDestroy();
         System.exit(0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        webView.reload();
     }
 }

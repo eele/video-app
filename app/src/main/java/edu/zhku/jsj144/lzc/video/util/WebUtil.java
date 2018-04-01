@@ -186,7 +186,7 @@ public class WebUtil {
     @JavascriptInterface
     public String getHistoryVid(int start, int size) throws IOException {
         String vidJson = "[]";
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/history");
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/" + SharedPreferencesUtil.getString(context, "uid", ""));
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         try {
             List<String> vidList = new ArrayList<String>();
@@ -210,6 +210,75 @@ public class WebUtil {
             br.close();
         }
         return vidJson;
+    }
+
+    @JavascriptInterface
+    public void deleteVideoItem(String id) {
+        OkGo.<String>delete(BaseApplication.REST_BASE_URL + "/videos/" + id)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        webView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                webView.loadUrl("javascript:refresh()");
+                            }
+                        });
+                    }
+                });
+    }
+
+    @JavascriptInterface
+    public void deleteHistoryItem(String id) throws IOException {
+        File file1 = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/" + SharedPreferencesUtil.getString(context, "uid", ""));
+        File file2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/vi/tmp" + SharedPreferencesUtil.getString(context, "uid", ""));
+        BufferedWriter bw = null;
+        BufferedReader br = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2)));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file1)));
+            String vid = br.readLine();
+            while (vid != null) {
+                if (! vid.equals(id)) {
+                    bw.write(vid);
+                    bw.newLine();
+                }
+                vid = br.readLine();
+            }
+            file1.delete();
+            file2.renameTo(file1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            bw.close();
+            br.close();
+        }
+        webView.post(new Runnable() {
+            @Override
+            public void run() {
+                webView.loadUrl("javascript:refresh()");
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public void cancelFavoriteItem(String id) {
+        HttpParams params = new HttpParams();
+        params.put("uid", SharedPreferencesUtil.getString(context, "uid", ""));
+        params.put("vid", id);
+        OkGo.<String>delete(BaseApplication.REST_BASE_URL + "/favorites")
+                .params(params)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        webView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                webView.loadUrl("javascript:refresh()");
+                            }
+                        });
+                    }
+                });
     }
 
     private boolean hasLogin() {
