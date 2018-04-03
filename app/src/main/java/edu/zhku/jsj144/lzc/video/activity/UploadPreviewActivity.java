@@ -18,6 +18,7 @@ import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.dialog.CustomProgressDialog;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
+import edu.zhku.jsj144.lzc.video.util.NotificationUtil;
 import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
 import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
@@ -213,10 +214,16 @@ public class UploadPreviewActivity extends AppCompatActivity {
                         try {
                             // 设置上传信息
                             Map<String, Object> vidData = new ObjectMapper().readValue(response.body(), Map.class);
-                            SharedPreferencesUtil.putString(
-                                    UploadPreviewActivity.this,
+                            SharedPreferencesUtil.putString(BaseApplication.getContext(),
                                     "vid" + (String) vidData.get("id"),
                                     getIntent().getStringExtra("path"));
+
+                            BaseApplication.getUploadIntent()
+                                    .putExtra("path", getIntent().getStringExtra("path"));
+                            BaseApplication.getUploadIntent().putExtra("vid", (String) vidData.get("id"));
+                            UploadPreviewActivity.this.startService(BaseApplication.getUploadIntent());
+                            NotificationUtil.showUploadNotifiction(UploadPreviewActivity.this);
+                            SharedPreferencesUtil.putString(BaseApplication.getContext(), "_uvideo", (String) vidData.get("id"));
 
                             // 打开上传视频列表
                             UploadPreviewActivity.this.setResult(RESULT_OK, null);

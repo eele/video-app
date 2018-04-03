@@ -17,6 +17,7 @@ import com.lzy.okgo.model.Response;
 import edu.zhku.jsj144.lzc.video.activity.*;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
+import edu.zhku.jsj144.lzc.video.service.UploadService;
 import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
 
 import java.io.*;
@@ -63,15 +64,19 @@ public class WebUtil {
     @JavascriptInterface
     public void pauseUpload(String vid, String progress) {
         context.stopService(BaseApplication.getUploadIntent());
-        SharedPreferencesUtil.putString(context, "p-" + vid, progress);
+        SharedPreferencesUtil.putString(BaseApplication.getContext(), "p-" + vid, progress);
+        NotificationUtil.cancelUploadNotifiction();
+        SharedPreferencesUtil.remove(BaseApplication.getContext(), "_uvideo");
     }
 
     @JavascriptInterface
     public void resumeUpload(String vid) {
         BaseApplication.getUploadIntent()
-                .putExtra("path", SharedPreferencesUtil.getString(context, "vid" + vid, ""));
+                .putExtra("path", SharedPreferencesUtil.getString(BaseApplication.getContext(), "vid" + vid, ""));
         BaseApplication.getUploadIntent().putExtra("vid", vid);
         context.startService(BaseApplication.getUploadIntent());
+        NotificationUtil.showUploadNotifiction(context);
+        SharedPreferencesUtil.putString(BaseApplication.getContext(), "_uvideo", vid);
     }
 
     @JavascriptInterface
@@ -80,7 +85,7 @@ public class WebUtil {
             return;
         }
         Intent intent = new Intent(context, UploadProcessingActivity.class);
-        intent.putExtra("uploadingVideoID", "0");
+        intent.putExtra("uploadingVideoID", SharedPreferencesUtil.getString(BaseApplication.getContext(), "_uvideo", "0"));
         context.startActivity(intent);
     }
 
@@ -125,13 +130,15 @@ public class WebUtil {
 
     @JavascriptInterface
     public int getSavedUploadProgress(String vid) {
-        return Integer.parseInt(SharedPreferencesUtil.getString(context, "p-" + vid, "0"));
+        return Integer.parseInt(SharedPreferencesUtil.getString(BaseApplication.getContext(), "p-" + vid, "0"));
     }
 
     @JavascriptInterface
-    public void removeSavedUploadProgress(String vid) {
-        SharedPreferencesUtil.remove(context, "p-" + vid);
+    public void finishUpload(String vid) {
+        SharedPreferencesUtil.remove(BaseApplication.getContext(), "p-" + vid);
         context.stopService(BaseApplication.getUploadIntent());
+        NotificationUtil.cancelUploadNotifiction();
+        SharedPreferencesUtil.remove(BaseApplication.getContext(), "_uvideo");
     }
 
     @JavascriptInterface

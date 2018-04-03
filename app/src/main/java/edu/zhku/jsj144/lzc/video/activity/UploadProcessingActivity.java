@@ -23,7 +23,6 @@ import java.util.Map;
 public class UploadProcessingActivity extends InterceptorActivity {
 
     private WebView webView;
-    private WebUtil webUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,22 +37,10 @@ public class UploadProcessingActivity extends InterceptorActivity {
             }
         });
 
-        webUtil = new WebUtil(UploadProcessingActivity.this);
         webView = (WebView) findViewById(R.id.uploadWebview);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(webUtil, "android");
+        webView.addJavascriptInterface(new WebUtil(UploadProcessingActivity.this, webView), "android");
         webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myvideos?uploadingVideoID=" + getIntent().getStringExtra("uploadingVideoID"));
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        webUtil.pauseUpload(getIntent().getStringExtra("uploadingVideoID"), UploadClient.getUploadProgress() + "");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        System.exit(0);
-    }
 }

@@ -1,2 +1,2 @@
-# videoapp
+# video-app
 A video app
