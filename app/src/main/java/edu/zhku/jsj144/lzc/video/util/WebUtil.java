@@ -62,40 +62,47 @@ public class WebUtil {
     }
 
     @JavascriptInterface
-    public void pauseUpload(String vid, String progress) {
+    public void pauseUpload(String vid, int progress) {
         context.stopService(BaseApplication.getUploadIntent());
-        SharedPreferencesUtil.putString(BaseApplication.getContext(), "p-" + vid, progress);
+        UploadXmlUtil.setProgress(context, vid, progress);
         NotificationUtil.cancelUploadNotifiction();
-        SharedPreferencesUtil.remove(BaseApplication.getContext(), "_uvideo");
+        UploadXmlUtil.setIsUploading(context, vid, 0);
     }
 
     @JavascriptInterface
     public void resumeUpload(String vid) {
+        UploadXmlUtil.Video video = UploadXmlUtil.getUploadingVideoInfo(context, vid);
         BaseApplication.getUploadIntent()
-                .putExtra("path", SharedPreferencesUtil.getString(BaseApplication.getContext(), "vid" + vid, ""));
+                .putExtra("path", video.getPath());
         BaseApplication.getUploadIntent().putExtra("vid", vid);
         context.startService(BaseApplication.getUploadIntent());
-        NotificationUtil.showUploadNotifiction(context);
-        SharedPreferencesUtil.putString(BaseApplication.getContext(), "_uvideo", vid);
+        NotificationUtil.showUploadNotifiction();
+        UploadXmlUtil.setIsUploading(context, vid, 1);
     }
 
     @JavascriptInterface
     public void openMyVideo() {
-        if (!hasLogin()) {
-            return;
-        }
-        Intent intent = new Intent(context, UploadProcessingActivity.class);
-        intent.putExtra("uploadingVideoID", SharedPreferencesUtil.getString(BaseApplication.getContext(), "_uvideo", "0"));
-        context.startActivity(intent);
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        Intent intent = new Intent(context, UploadProcessingActivity.class);
+                        intent.putExtra("uploadingVideoID", UploadXmlUtil.getCurrentUploadingVideoID(context));
+                        context.startActivity(intent);
+                    }
+                });
     }
 
     @JavascriptInterface
     public void openMyFavorite() {
-        if (!hasLogin()) {
-            return;
-        }
-        Intent intent = new Intent(context, FavoritesActivity.class);
-        context.startActivity(intent);
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        Intent intent = new Intent(context, FavoritesActivity.class);
+                        context.startActivity(intent);
+                    }
+                });
     }
 
     @JavascriptInterface
@@ -107,20 +114,26 @@ public class WebUtil {
 
     @JavascriptInterface
     public void openMySubscribe() {
-        if (!hasLogin()) {
-            return;
-        }
-        Intent intent = new Intent(context, SubscribeActivity.class);
-        context.startActivity(intent);
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        Intent intent = new Intent(context, SubscribeActivity.class);
+                        context.startActivity(intent);
+                    }
+                });
     }
 
     @JavascriptInterface
     public void openMyHistory() {
-        if (!hasLogin()) {
-            return;
-        }
-        Intent intent = new Intent(context, HistoryActivity.class);
-        context.startActivity(intent);
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        Intent intent = new Intent(context, HistoryActivity.class);
+                        context.startActivity(intent);
+                    }
+                });
     }
 
     @JavascriptInterface
@@ -130,15 +143,14 @@ public class WebUtil {
 
     @JavascriptInterface
     public int getSavedUploadProgress(String vid) {
-        return Integer.parseInt(SharedPreferencesUtil.getString(BaseApplication.getContext(), "p-" + vid, "0"));
+        return UploadXmlUtil.getUploadingVideoInfo(context, vid).getProgress();
     }
 
     @JavascriptInterface
     public void finishUpload(String vid) {
-        SharedPreferencesUtil.remove(BaseApplication.getContext(), "p-" + vid);
+        UploadXmlUtil.removeUploadingVideo(context, vid);
         context.stopService(BaseApplication.getUploadIntent());
         NotificationUtil.cancelUploadNotifiction();
-        SharedPreferencesUtil.remove(BaseApplication.getContext(), "_uvideo");
     }
 
     @JavascriptInterface
@@ -233,6 +245,7 @@ public class WebUtil {
 
     @JavascriptInterface
     public void deleteVideoItem(String id) {
+        UploadXmlUtil.removeUploadingVideo(context, id);
         OkGo.<String>delete(BaseApplication.REST_BASE_URL + "/videos/" + id)
                 .execute(new StringCallback() {
                     @Override
@@ -300,16 +313,9 @@ public class WebUtil {
                 });
     }
 
-    private boolean hasLogin() {
-        String uid = SharedPreferencesUtil.getString(context, "uid", "");
-        String token = SharedPreferencesUtil.getString(context, "token", "");
-        if (uid.equals("") || token.equals("")) {
-            // 要求重新登录
-            Intent intent = new Intent(context, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            BaseApplication.getContext().startActivity(intent);
-            return false;
-        }
-        return true;
+    @JavascriptInterface
+    public String getToken() {
+        return SharedPreferencesUtil.getString(BaseApplication.getContext(), "token", "");
     }
+
 }

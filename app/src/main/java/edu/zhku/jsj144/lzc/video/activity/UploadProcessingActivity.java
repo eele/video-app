@@ -40,7 +40,8 @@ public class UploadProcessingActivity extends InterceptorActivity {
         webView = (WebView) findViewById(R.id.uploadWebview);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.addJavascriptInterface(new WebUtil(UploadProcessingActivity.this, webView), "android");
-        webView.loadUrl(BaseApplication.PAGE_BASE_URL + "/myvideos?uploadingVideoID=" + getIntent().getStringExtra("uploadingVideoID"));
+        webView.loadUrl(BaseApplication.PAGE_BASE_URL
+                + "/myvideos?uploadingVideoID=" + getIntent().getStringExtra("uploadingVideoID"));
     }
 
 }

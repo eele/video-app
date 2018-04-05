@@ -15,7 +15,7 @@ public class SharedPreferencesUtil {
     public static void putBoolean(Context ctx, String key, boolean value){
         //(存储节点文件名称,读写方式)
         if(sp == null){
-            sp = ctx.getSharedPreferences(xml_name, Context.MODE_PRIVATE);
+            sp = ctx.getSharedPreferences(xml_name, Context.MODE_MULTI_PROCESS);
         }
         sp.edit().putBoolean(key, value).commit();
     }
@@ -29,7 +29,7 @@ public class SharedPreferencesUtil {
     public static boolean getBoolean(Context ctx,String key,boolean defValue){
         //(存储节点文件名称,读写方式)
         if(sp == null){
-            sp = ctx.getSharedPreferences(xml_name, Context.MODE_PRIVATE);
+            sp = ctx.getSharedPreferences(xml_name, Context.MODE_MULTI_PROCESS);
         }
         return sp.getBoolean(key, defValue);
     }
@@ -43,7 +43,7 @@ public class SharedPreferencesUtil {
     public static void putString(Context ctx,String key,String value){
         //(存储节点文件名称,读写方式)
         if(sp == null){
-            sp = ctx.getSharedPreferences(xml_name, Context.MODE_PRIVATE);
+            sp = ctx.getSharedPreferences(xml_name, Context.MODE_MULTI_PROCESS);
         }
         sp.edit().putString(key, value).commit();
     }
@@ -57,7 +57,7 @@ public class SharedPreferencesUtil {
     public static String getString(Context ctx,String key,String defValue){
         //(存储节点文件名称,读写方式)
         if(sp == null){
-            sp = ctx.getSharedPreferences(xml_name, Context.MODE_PRIVATE);
+            sp = ctx.getSharedPreferences(xml_name, Context.MODE_MULTI_PROCESS);
         }
         return sp.getString(key, defValue);
     }
@@ -68,7 +68,7 @@ public class SharedPreferencesUtil {
      */
     public static void remove(Context ctx, String key) {
         if(sp == null){
-            sp = ctx.getSharedPreferences(xml_name, Context.MODE_PRIVATE);
+            sp = ctx.getSharedPreferences(xml_name, Context.MODE_MULTI_PROCESS);
         }
         sp.edit().remove(key).commit();
     }

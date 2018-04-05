@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v7.app.NotificationCompat;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -12,9 +13,9 @@ public class NotificationUtil {
 
     private static NotificationManager mNotificationManager;
 
-    public static void showUploadNotifiction(Context context) {
-        mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+    public static void showUploadNotifiction() {
+        mNotificationManager = (NotificationManager) BaseApplication.getContext().getSystemService(NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(BaseApplication.getContext());
         mBuilder.setContentTitle("Video")//设置通知栏标题
                 .setContentText("一个视频正在上传...") //设置通知栏显示内容
 //                .setContentIntent(getDefalutIntent(Notification.FLAG_AUTO_CANCEL)) //设置通知栏点击意图

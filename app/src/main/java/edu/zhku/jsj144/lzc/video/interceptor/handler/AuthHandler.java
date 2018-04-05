@@ -2,6 +2,7 @@ package edu.zhku.jsj144.lzc.video.interceptor.handler;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,11 +28,22 @@ public abstract class AuthHandler extends Handler {
         BaseApplication.getContext().startActivity(intent);
     }
 
-    public void onServerError(Response response) throws IOException {
+    public void onServerError(final Response response) throws IOException {
         // 提示服务端异常信息
-        Map<String, Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
-        Toast.makeText(BaseApplication.getContext(),
-                (String) info.get("msg"), Toast.LENGTH_LONG).show();
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                try {
+                    Map<String, Object> info = new ObjectMapper().readValue(response.body().string(), Map.class);
+                    Looper.prepare();
+                    Toast.makeText(BaseApplication.getContext(),
+                            (String) info.get("msg"), Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public void onOtherHttpError(Response response) throws IOException {

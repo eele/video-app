@@ -23,7 +23,6 @@ public class UploadService extends Service {
         String videoPath = intent.getStringExtra("path");
         String vid = intent.getStringExtra("vid");
         UploadClient.setUid(SharedPreferencesUtil.getString(this, "uid", "null"));
-        System.out.println("123456---" + vid + "  " + videoPath);
         asyncTask = new UploadAsyncTask(videoPath,vid);
         asyncTask.execute();
         return super.onStartCommand(intent, flags, startId);
