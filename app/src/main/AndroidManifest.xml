@@ -74,7 +74,7 @@
                 android:name=".service.UploadService"
                 android:enabled="true"
                 android:exported="false"
-                android:process=":uploadProcessing">
+                android:process=":uploadService">
         </service>
 
         <activity android:name=".activity.LoginActivity">

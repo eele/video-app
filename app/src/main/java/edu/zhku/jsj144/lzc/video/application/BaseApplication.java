@@ -8,6 +8,7 @@ import com.lzy.okgo.cache.CacheEntity;
 import com.lzy.okgo.cache.CacheMode;
 import edu.zhku.jsj144.lzc.video.interceptor.AuthInterceptor;
 import edu.zhku.jsj144.lzc.video.service.UploadService;
+import net.grandcentrix.tray.AppPreferences;
 import okhttp3.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class BaseApplication extends Application {
     private static Context context;
     private static Intent uploadIntent;
+    private static AppPreferences appPreferences;
     public static final String REST_BASE_URL = "http://192.168.0.149:8080/video/service/r";
     public static final String UPLOAD_BASE_IP = "192.168.0.149";
     public static final String PLAY_BASE_URL = "http://192.168.0.149";
@@ -32,6 +34,7 @@ public class BaseApplication extends Application {
         super.onCreate();
         context = getApplicationContext();
         uploadIntent = new Intent(context, UploadService.class);
+        appPreferences = new AppPreferences(context);
 
         // 初始化网络请求
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -57,5 +60,9 @@ public class BaseApplication extends Application {
 
     public static Intent getUploadIntent() {
         return uploadIntent;
+    }
+
+    public static AppPreferences getAppPreferences() {
+        return appPreferences;
     }
 }

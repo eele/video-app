@@ -172,7 +172,7 @@ public class UploadXmlUtil {
             video.setProgress(Integer.parseInt(videoEle.attributeValue("progress")));
         } catch(Exception e) {
             e.printStackTrace();
-            Toast.makeText(BaseApplication.getContext(),"下载状态存取异常", Toast.LENGTH_LONG).show();
+//            Toast.makeText(BaseApplication.getContext(),"下载状态存取异常", Toast.LENGTH_LONG).show();
         }
         return video;
     }
@@ -203,7 +203,7 @@ public class UploadXmlUtil {
             videoEle = (Element)doc.selectSingleNode(xpath);
         } catch(Exception e) {
             e.printStackTrace();
-            Toast.makeText(BaseApplication.getContext(),"下载状态存取异常", Toast.LENGTH_LONG).show();
+//            Toast.makeText(BaseApplication.getContext(),"下载状态存取异常", Toast.LENGTH_LONG).show();
         }
         if (videoEle == null) {
             return "0";

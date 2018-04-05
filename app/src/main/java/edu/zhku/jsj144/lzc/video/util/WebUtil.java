@@ -19,6 +19,7 @@ import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
 import edu.zhku.jsj144.lzc.video.service.UploadService;
 import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
+import net.grandcentrix.tray.core.ItemNotFoundException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -57,15 +58,9 @@ public class WebUtil {
     }
 
     @JavascriptInterface
-    public void promptUploadSuccess() {
-        Toast.makeText(context, "一个视频已成功上传", Toast.LENGTH_LONG).show();
-    }
-
-    @JavascriptInterface
     public void pauseUpload(String vid, int progress) {
         context.stopService(BaseApplication.getUploadIntent());
         UploadXmlUtil.setProgress(context, vid, progress);
-        NotificationUtil.cancelUploadNotifiction();
         UploadXmlUtil.setIsUploading(context, vid, 0);
     }
 
@@ -76,7 +71,6 @@ public class WebUtil {
                 .putExtra("path", video.getPath());
         BaseApplication.getUploadIntent().putExtra("vid", vid);
         context.startService(BaseApplication.getUploadIntent());
-        NotificationUtil.showUploadNotifiction();
         UploadXmlUtil.setIsUploading(context, vid, 1);
     }
 
@@ -137,20 +131,19 @@ public class WebUtil {
     }
 
     @JavascriptInterface
-    public long getUploadProgress() {
-        return UploadClient.getUploadProgress();
+    public int getUploadProgress() {
+        int p = 0;
+        try {
+            p = BaseApplication.getAppPreferences().getInt("progress");
+        } catch (ItemNotFoundException e) {
+            e.printStackTrace();
+        }
+        return p;
     }
 
     @JavascriptInterface
     public int getSavedUploadProgress(String vid) {
         return UploadXmlUtil.getUploadingVideoInfo(context, vid).getProgress();
-    }
-
-    @JavascriptInterface
-    public void finishUpload(String vid) {
-        UploadXmlUtil.removeUploadingVideo(context, vid);
-        context.stopService(BaseApplication.getUploadIntent());
-        NotificationUtil.cancelUploadNotifiction();
     }
 
     @JavascriptInterface

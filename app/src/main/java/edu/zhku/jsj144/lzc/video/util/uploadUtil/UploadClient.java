@@ -56,11 +56,11 @@ public class UploadClient {
      * 获取上传进度
      * @return
      */
-    public static long getUploadProgress() {
+    public static int getUploadProgress() {
         if (chunkedFile == null) {
             return 0;
         } else {
-            return (long) (chunkedFile.currentOffset() * 1.0 / chunkedFile.endOffset() * 100);
+            return (int) (chunkedFile.currentOffset() * 1.0 / chunkedFile.endOffset() * 100);
         }
     }
 
