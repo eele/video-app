@@ -12,16 +12,18 @@ import java.io.IOException;
 public class FileInfoClientHandler extends SimpleChannelInboundHandler<Info> {
 	
 	private String uid;
+	private String token;
     private String localFilepath;
     private String vid;
 
-	public FileInfoClientHandler(String uid, String localFilepath, String vid) {
+    public FileInfoClientHandler(String uid, String token, String localFilepath, String vid) {
 		this.uid = uid;
-        this.localFilepath = localFilepath;
-        this.vid = vid;
-	}
+		this.token = token;
+		this.localFilepath = localFilepath;
+		this.vid = vid;
+    }
 
-	@Override
+    @Override
 	protected void channelRead0(ChannelHandlerContext ctx, Info msg) {
 		ctx.pipeline().remove(this);
 		ctx.pipeline().remove("encoder");
@@ -34,6 +36,7 @@ public class FileInfoClientHandler extends SimpleChannelInboundHandler<Info> {
 	public void channelActive(ChannelHandlerContext ctx) throws IOException {
 		Info info = new Info("FILEINFO");
 		info.setUid(uid);
+        info.setToken(token);
 		info.setVid(vid);
 		info.setTotalsize(new File(localFilepath).length());
 		ctx.writeAndFlush(info);

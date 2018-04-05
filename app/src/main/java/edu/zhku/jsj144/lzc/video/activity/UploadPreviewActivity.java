@@ -23,6 +23,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 import java.util.Timer;
@@ -215,7 +216,9 @@ public class UploadPreviewActivity extends AppCompatActivity {
                                     "vid" + (String) vidData.get("id"),
                                     getIntent().getStringExtra("path"));
                             UploadXmlUtil.addUploadingVideo(UploadPreviewActivity.this,
-                                    (String) vidData.get("id"), getIntent().getStringExtra("path"));
+                                    (String) vidData.get("id"), "视频题目",
+                                    String.valueOf(new Timestamp(System.currentTimeMillis()).getTime()),
+                                    getIntent().getStringExtra("path"));
 
                             // 打开上传视频列表
                             UploadPreviewActivity.this.setResult(RESULT_OK, null);

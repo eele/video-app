@@ -33,6 +33,7 @@ public class UploadService extends Service {
         String videoPath = intent.getStringExtra("path");
         vid = intent.getStringExtra("vid");
         UploadClient.setUid(SharedPreferencesUtil.getString(this, "uid", "null"));
+        UploadClient.setToken(SharedPreferencesUtil.getString(this, "token", "null"));
         asyncTask = new UploadAsyncTask(videoPath,vid);
         asyncTask.execute();
         return super.onStartCommand(intent, flags, startId);

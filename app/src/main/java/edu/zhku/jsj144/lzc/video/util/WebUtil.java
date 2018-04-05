@@ -8,7 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.EditText;
-import android.widget.Toast;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -17,8 +17,6 @@ import com.lzy.okgo.model.Response;
 import edu.zhku.jsj144.lzc.video.activity.*;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
-import edu.zhku.jsj144.lzc.video.service.UploadService;
-import edu.zhku.jsj144.lzc.video.util.uploadUtil.UploadClient;
 import net.grandcentrix.tray.core.ItemNotFoundException;
 
 import java.io.*;
@@ -62,6 +60,7 @@ public class WebUtil {
         context.stopService(BaseApplication.getUploadIntent());
         UploadXmlUtil.setProgress(context, vid, progress);
         UploadXmlUtil.setIsUploading(context, vid, 0);
+        BaseApplication.getAppPreferences().put("progress", 0);
     }
 
     @JavascriptInterface
@@ -75,8 +74,14 @@ public class WebUtil {
     }
 
     @JavascriptInterface
+    public String getUploadingVideos() throws JsonProcessingException {
+        List<UploadXmlUtil.Video> videos = UploadXmlUtil.getUploadingVideoList(context);
+        return new ObjectMapper().writeValueAsString(videos);
+    }
+
+    @JavascriptInterface
     public void openMyVideo() {
-        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/v")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
@@ -89,7 +94,7 @@ public class WebUtil {
 
     @JavascriptInterface
     public void openMyFavorite() {
-        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/v")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
@@ -108,7 +113,7 @@ public class WebUtil {
 
     @JavascriptInterface
     public void openMySubscribe() {
-        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/v")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
@@ -120,7 +125,7 @@ public class WebUtil {
 
     @JavascriptInterface
     public void openMyHistory() {
-        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/uploading")
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/videos/p/v")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
@@ -237,7 +242,7 @@ public class WebUtil {
     }
 
     @JavascriptInterface
-    public void deleteVideoItem(String id) {
+    public void deleteVideoItem(final String id) {
         UploadXmlUtil.removeUploadingVideo(context, id);
         OkGo.<String>delete(BaseApplication.REST_BASE_URL + "/videos/" + id)
                 .execute(new StringCallback() {
@@ -246,6 +251,7 @@ public class WebUtil {
                         webView.post(new Runnable() {
                             @Override
                             public void run() {
+                                UploadXmlUtil.removeUploadingVideo(context, id);
                                 webView.loadUrl("javascript:refresh()");
                             }
                         });

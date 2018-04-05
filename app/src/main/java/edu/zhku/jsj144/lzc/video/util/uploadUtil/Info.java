@@ -3,13 +3,14 @@ package edu.zhku.jsj144.lzc.video.util.uploadUtil;
 import java.io.Serializable;
 
 public class Info implements Serializable {
-	
+
 	private static final long serialVersionUID = 5854616671405393764L;
 	private String message;
 	private long finishedSize;
 	private long totalsize;
 	private String uid;
 	private String vid;
+	private String token;
 
 	public Info(String message) {
 		this.message = message;
@@ -55,4 +56,11 @@ public class Info implements Serializable {
 		this.vid = vid;
 	}
 
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
 }

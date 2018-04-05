@@ -19,6 +19,7 @@ import io.netty.handler.stream.ChunkedFile;
 public class UploadClient {
 
     private static String uid = null;
+    private static String token = null;
 	protected static ChunkedFile chunkedFile;
 
     public static void setUid(String uid) {
@@ -40,7 +41,7 @@ public class UploadClient {
 					ch.pipeline().addLast("decoder",
 							new ObjectDecoder(ClassResolvers.cacheDisabled(this.getClass().getClassLoader())));
 					ch.pipeline().addLast("encoder", new ObjectEncoder());
-					ch.pipeline().addLast("handler", new FileInfoClientHandler(uid, localFilepath, vid));
+					ch.pipeline().addLast("handler", new FileInfoClientHandler(uid, token, localFilepath, vid));
 				}
 
 			});
@@ -64,4 +65,7 @@ public class UploadClient {
         }
     }
 
+    public static void setToken(String token) {
+        UploadClient.token = token;
+    }
 }

@@ -12,12 +12,17 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class UploadXmlUtil {
 
     public static class Video {
         private String vid;
         private String path;
+        private String title;
+        private long datetime;
         private int progress;
 
         public String getVid() {
@@ -34,6 +39,22 @@ public class UploadXmlUtil {
 
         public void setPath(String path) {
             this.path = path;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public long getDatetime() {
+            return datetime;
+        }
+
+        public void setDatetime(long datetime) {
+            this.datetime = datetime;
         }
 
         public int getProgress() {
@@ -55,7 +76,7 @@ public class UploadXmlUtil {
         }
     }
 
-    public static void addUploadingVideo(Context context, String vid, String path) {
+    public static void addUploadingVideo(Context context, String vid, String title, String datetime, String path) {
         /*
          * 1. 得到Document
          * 2. 得到root元素
@@ -98,6 +119,8 @@ public class UploadXmlUtil {
             // 设置videoElement的属性！
             video.addAttribute("vid", vid);
             video.addAttribute("path", path);
+            video.addAttribute("title", title);
+            video.addAttribute("datetime", datetime);
             video.addAttribute("progress", String.valueOf(0));
             video.addAttribute("isUploading", "0");
 
@@ -169,12 +192,46 @@ public class UploadXmlUtil {
             // 获取元素的vid属性值，赋给对象的vid属性
             video.setVid(videoEle.attributeValue("vid"));
             video.setPath(videoEle.attributeValue("path"));
+            video.setTitle(videoEle.attributeValue("title"));
+            video.setDatetime(Long.parseLong(videoEle.attributeValue("datetime")));
             video.setProgress(Integer.parseInt(videoEle.attributeValue("progress")));
         } catch(Exception e) {
             e.printStackTrace();
 //            Toast.makeText(BaseApplication.getContext(),"下载状态存取异常", Toast.LENGTH_LONG).show();
         }
         return video;
+    }
+
+    public static List<Video> getUploadingVideoList(Context context) {
+        List<Video> videos = new ArrayList<>();
+        try {
+            // 创建解析器
+            SAXReader reader = new SAXReader();
+            // 调用读方法，得到Document
+            Document doc = reader.read(new File(Environment.getExternalStorageDirectory()
+                    .getAbsolutePath() + "/vi/uploading/"
+                    + SharedPreferencesUtil.getString(context, "uid", "")));
+
+            Element root = doc.getRootElement();
+            if(root == null) {
+                return videos;
+            }
+            Iterator iter = root.elementIterator();
+            while (iter.hasNext()) {
+                Video video = new Video();
+                Element videoEle = (Element) iter.next();
+                video.setVid(videoEle.attributeValue("vid"));
+                video.setPath(videoEle.attributeValue("path"));
+                video.setTitle(videoEle.attributeValue("title"));
+                video.setDatetime(Long.parseLong(videoEle.attributeValue("datetime")));
+                video.setProgress(Integer.parseInt(videoEle.attributeValue("progress")));
+                videos.add(video);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+//            Toast.makeText(BaseApplication.getContext(),"下载状态存取异常", Toast.LENGTH_LONG).show();
+        }
+        return videos;
     }
 
     public static String getCurrentUploadingVideoID(Context context) {
