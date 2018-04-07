@@ -95,12 +95,12 @@ public class PlayActivity extends AppCompatActivity {
 
             @Override
             public void onBufferingStart(MediaPlayer mediaPlayer) {// steam start loading
-                Log.d("", "onBufferingStart UniversalVideoView callback");
+//                Log.d("", "onBufferingStart UniversalVideoView callback");
             }
 
             @Override
             public void onBufferingEnd(MediaPlayer mediaPlayer) {// steam end loading
-                Log.d("", "onBufferingEnd UniversalVideoView callback");
+//                Log.d("", "onBufferingEnd UniversalVideoView callback");
             }
 
         });

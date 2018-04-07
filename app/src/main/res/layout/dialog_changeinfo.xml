@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:stretchColumns="1"
+             android:background="@color/colorPrimary"
+>
+    <TableRow>
+        <TextView
+                android:layout_marginLeft="20dp"
+                android:textColor="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="用户名："
+                android:textSize="16sp"
+        />
+        <EditText
+                android:layout_marginRight="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:id="@+id/username"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+                android:layout_marginLeft="20dp"
+                android:textColor="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="个人描述："
+                android:textSize="16sp"
+        />
+        <EditText
+                android:layout_marginRight="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:id="@+id/userdesc"/>
+    </TableRow>
+</TableLayout>

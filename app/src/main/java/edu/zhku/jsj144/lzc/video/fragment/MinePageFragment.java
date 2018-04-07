@@ -2,6 +2,7 @@ package edu.zhku.jsj144.lzc.video.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,10 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.FileCallback;
@@ -27,9 +27,11 @@ import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.activity.FavoritesActivity;
 import edu.zhku.jsj144.lzc.video.activity.LoginActivity;
 import edu.zhku.jsj144.lzc.video.activity.UploadChoiceActivity;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
+import edu.zhku.jsj144.lzc.video.util.MD5Util;
 import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
 import edu.zhku.jsj144.lzc.video.util.WebUtil;
 
@@ -80,10 +82,28 @@ public class MinePageFragment extends Fragment {
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Button logout = new Button(activity);
-                logout.setText("退出登录");
+                LinearLayout settingLayout =(LinearLayout) activity.getLayoutInflater()
+                        .inflate(R.layout.dialog_setting, null);
+                Button changePwd = settingLayout.findViewById(R.id.changePwd);
+                Button changeInfo = settingLayout.findViewById(R.id.changeInfo);
+                Button logout = settingLayout.findViewById(R.id.logout);
+
+                changeInfo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        changeInfo();
+                    }
+                });
+                changePwd.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        changePwd();
+                    }
+                });
+
                 final Dialog dialog = new AlertDialog.Builder(activity).setTitle("设置").setIcon(
-                        android.R.drawable.ic_dialog_info).setView(logout)
+                        android.R.drawable.ic_dialog_info)
+                        .setView(settingLayout)
                         .setNegativeButton("关闭", null).show();
 
                 logout.setOnClickListener(new View.OnClickListener() {
@@ -210,5 +230,80 @@ public class MinePageFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    private void changePwd() {
+        LinearLayout cPwdLayout =(LinearLayout) activity.getLayoutInflater()
+                .inflate(R.layout.dialog_changepwd, null);
+        final EditText newPwd = cPwdLayout.findViewById(R.id.newPwd);
+        final EditText conPwd = cPwdLayout.findViewById(R.id.conPwd);
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (! newPwd.getText().toString().equals(conPwd.getText().toString())) {
+                    Toast.makeText(activity, "新密码与确认密码不一致", Toast.LENGTH_LONG).show();
+                } else {
+                    HttpParams params = new HttpParams();
+                    params.put("pwd", MD5Util.md5Password(newPwd.getText().toString()));
+                    OkGo.<String>put(BaseApplication.REST_BASE_URL + "/users/" + SharedPreferencesUtil.getString(activity, "uid", "null") + "/password")
+                            .params(params)
+                            .execute(new StringCallback() {
+                                @Override
+                                public void onSuccess(Response<String> response) {
+                                    Toast.makeText(activity, "密码修改成功", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                }
+            }
+        };
+        new AlertDialog.Builder(activity).setTitle("修改密码").setIcon(
+                android.R.drawable.ic_dialog_info)
+                .setView(cPwdLayout)
+                .setPositiveButton("确定", listener)
+                .setNegativeButton("取消", null).show();
+    }
+
+    private void changeInfo() {
+        LinearLayout cInfoLayout =(LinearLayout) activity.getLayoutInflater()
+                .inflate(R.layout.dialog_changeinfo, null);
+        final EditText username = cInfoLayout.findViewById(R.id.username);
+        final EditText userdesc = cInfoLayout.findViewById(R.id.userdesc);
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                HttpParams params = new HttpParams();
+                params.put("username", username.getText().toString());
+                params.put("description", userdesc.getText().toString());
+                OkGo.<String>put(BaseApplication.REST_BASE_URL + "/users/" + SharedPreferencesUtil.getString(activity, "uid", "null") + "/info")
+                        .params(params)
+                        .execute(new StringCallback() {
+                            @Override
+                            public void onSuccess(Response<String> response) {
+                                OkGo.<String>get(BaseApplication.REST_BASE_URL + "/users/" + SharedPreferencesUtil.getString(activity, "uid", ""))
+                                        .execute(new StringCallback() {
+                                                     @Override
+                                                     public void onSuccess(Response<String> response) {
+                                                         try {
+                                                             Map<String, Object> user = new ObjectMapper().readValue(response.body(), Map.class);
+                                                             usernameView.setText((String) user.get("username"));
+                                                         } catch (JsonParseException e) {
+                                                             e.printStackTrace();
+                                                         } catch (JsonMappingException e) {
+                                                             e.printStackTrace();
+                                                         } catch (IOException e) {
+                                                             e.printStackTrace();
+                                                         }
+                                                     }
+                                                 });
+                                Toast.makeText(activity, "个人信息修改成功", Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
+        };
+        new AlertDialog.Builder(activity).setTitle("修改个人信息").setIcon(
+                android.R.drawable.ic_dialog_info)
+                .setView(cInfoLayout)
+                .setPositiveButton("确定", listener)
+                .setNegativeButton("取消", null).show();
     }
 }

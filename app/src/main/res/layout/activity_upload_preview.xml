@@ -57,12 +57,6 @@
                         android:id="@+id/videoSeekBar"
                         android:layout_weight="1"/>
             </LinearLayout>
-            <TextView
-                    android:text="暂停或拖动进度条确定视频封面"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp" android:id="@+id/textView" android:layout_weight="1"/>
             <LinearLayout
                     android:background="@drawable/border"
                     android:layout_marginTop="30dp"
@@ -95,11 +89,13 @@
                         android:gravity="center"
                         android:layout_width="66dp"
                         android:layout_height="match_parent"/>
-                <EditText
+                <TextView
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@null"
-                        android:inputType="text"
+                        android:gravity="center_vertical"
+                        android:text="请选择..."
+                        android:textColor="@color/uvv_gray"
                         android:textSize="16sp"
                         android:layout_weight="1"
                         android:id="@+id/v_category"/>
@@ -126,26 +122,25 @@
                         android:layout_weight="1"
                         android:id="@+id/v_desc"/>
             </LinearLayout>
-            <LinearLayout
-                    android:background="@drawable/border"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" android:layout_weight="1">
-                <TextView
-                        android:text="隐私设置"
-                        android:textSize="16sp"
-                        android:gravity="center"
-                        android:layout_width="100dp"
-                        android:layout_height="match_parent"/>
-                <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@null"
-                        android:inputType="text"
-                        android:textSize="16sp"
-                        android:layout_weight="1"
-                        android:id="@+id/v_privacy"/>
-            </LinearLayout>
+            <!--<LinearLayout-->
+                    <!--android:background="@drawable/border"-->
+                    <!--android:orientation="horizontal"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent" android:layout_weight="1">-->
+                <!--<TextView-->
+                        <!--android:text="隐私设置"-->
+                        <!--android:textSize="16sp"-->
+                        <!--android:gravity="center"-->
+                        <!--android:layout_width="100dp"-->
+                        <!--android:layout_height="match_parent"/>-->
+                <!--<TextView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="40dp"-->
+                        <!--android:background="@null"-->
+                        <!--android:textSize="16sp"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:id="@+id/v_privacy"/>-->
+            <!--</LinearLayout>-->
             <Button
                     android:text="上 传"
                     android:textStyle="bold"

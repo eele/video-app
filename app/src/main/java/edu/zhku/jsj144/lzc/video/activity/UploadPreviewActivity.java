@@ -1,14 +1,17 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.SeekBar;
+import android.widget.*;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -18,16 +21,16 @@ import edu.zhku.jsj144.lzc.video.R;
 import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.dialog.CustomProgressDialog;
 import edu.zhku.jsj144.lzc.video.interceptor.handler.AuthHandler;
-import edu.zhku.jsj144.lzc.video.util.*;
+import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
+import edu.zhku.jsj144.lzc.video.util.UploadXmlUtil;
+import edu.zhku.jsj144.lzc.video.util.VideoPlayerIJK;
+import edu.zhku.jsj144.lzc.video.util.VideoPlayerListener;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class UploadPreviewActivity extends AppCompatActivity {
 
@@ -37,6 +40,11 @@ public class UploadPreviewActivity extends AppCompatActivity {
     private String url = BaseApplication.REST_BASE_URL + "/videos";
 
     private CustomProgressDialog dialog;
+    private TextView category;
+    private EditText titleEditText;
+    private EditText descEditText;
+
+    private String cid = "";
 
     private AuthHandler authHandler = new AuthHandler() {
         @Override
@@ -75,9 +83,18 @@ public class UploadPreviewActivity extends AppCompatActivity {
         final ImageButton playButton = (ImageButton) findViewById(R.id.playButton);
         seekBar = (SeekBar) findViewById(R.id.videoSeekBar);
 
+        category = (TextView) findViewById(R.id.v_category);
+        category.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getCategory();
+            }
+        });
+        descEditText = (EditText) findViewById(R.id.v_desc);
+
         // 显示默认视频标题
         String videoTitle = getIntent().getStringExtra("title");
-        EditText titleEditText = (EditText) findViewById(R.id.v_title);
+        titleEditText = (EditText) findViewById(R.id.v_title);
         titleEditText.setText(videoTitle);
 
         // 视频地址
@@ -198,39 +215,42 @@ public class UploadPreviewActivity extends AppCompatActivity {
     }
 
     private void postVideo() {
-        HttpParams params = new HttpParams();
-        params.put("title", "视频题目");
-        params.put("uid", SharedPreferencesUtil.getString(this, "uid", ""));
-        params.put("cid", "qw");
-        params.put("description", "视频描述");
-        params.put("permission", "0");
-        OkGo.<String>post(url)
-                .params(params)
-                .execute(new StringCallback() {
-                    @Override
-                    public void onSuccess(Response<String> response) {
-                        try {
-                            // 设置上传信息
-                            Map<String, Object> vidData = new ObjectMapper().readValue(response.body(), Map.class);
-                            SharedPreferencesUtil.putString(BaseApplication.getContext(),
-                                    "vid" + (String) vidData.get("id"),
-                                    getIntent().getStringExtra("path"));
-                            UploadXmlUtil.addUploadingVideo(UploadPreviewActivity.this,
-                                    (String) vidData.get("id"), "视频题目",
-                                    String.valueOf(new Timestamp(System.currentTimeMillis()).getTime()),
-                                    getIntent().getStringExtra("path"));
+        if (titleEditText.getText().toString().length() == 0 || cid.length() == 0) {
+            Toast.makeText(UploadPreviewActivity.this, "标题与分类不为空", Toast.LENGTH_LONG).show();
+        } else {
+            HttpParams params = new HttpParams();
+            params.put("title", titleEditText.getText().toString());
+            params.put("uid", SharedPreferencesUtil.getString(this, "uid", ""));
+            params.put("cid", cid);
+            params.put("description", descEditText.getText().toString());
+            OkGo.<String>post(url)
+                    .params(params)
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(Response<String> response) {
+                            try {
+                                // 设置上传信息
+                                Map<String, Object> vidData = new ObjectMapper().readValue(response.body(), Map.class);
+                                SharedPreferencesUtil.putString(BaseApplication.getContext(),
+                                        "vid" + (String) vidData.get("id"),
+                                        getIntent().getStringExtra("path"));
+                                UploadXmlUtil.addUploadingVideo(UploadPreviewActivity.this,
+                                        (String) vidData.get("id"), "视频题目",
+                                        String.valueOf(new Timestamp(System.currentTimeMillis()).getTime()),
+                                        getIntent().getStringExtra("path"));
 
-                            // 打开上传视频列表
-                            UploadPreviewActivity.this.setResult(RESULT_OK, null);
-                            UploadPreviewActivity.this.finish();
-                            Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
-                            intent.putExtra("uploadingVideoID", (String) vidData.get("id"));
-                            startActivity(intent);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                                // 打开上传视频列表
+                                UploadPreviewActivity.this.setResult(RESULT_OK, null);
+                                UploadPreviewActivity.this.finish();
+                                Intent intent = new Intent(UploadPreviewActivity.this, UploadProcessingActivity.class);
+                                intent.putExtra("uploadingVideoID", (String) vidData.get("id"));
+                                startActivity(intent);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                });
+                    });
+        }
     }
 
     /**
@@ -243,5 +263,42 @@ public class UploadPreviewActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void getCategory() {
+        OkGo.<String>get(BaseApplication.REST_BASE_URL + "/categories?name=")
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        try {
+                            final List<Map<String, Object>> categories = new ObjectMapper()
+                                    .readValue(response.body(), new TypeReference<List<Map<String, Object>>>() {});
+                            final String[] items = new String[categories.size()];
+                            int i = 0;
+                            for (Map<String, Object> map: categories) {
+                                items[i] = (String) map.get("name");
+                                i++;
+                            }
+                            AlertDialog.Builder builder = new AlertDialog.Builder(UploadPreviewActivity.this);
+                            builder.setIcon(android.R.drawable.ic_dialog_info).setTitle("选择分类")
+                                    .setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            cid = (String) ((Map<String, Object>) categories.get(which)).get("id");
+                                            category.setText(items[which]);
+                                            category.setTextColor(Color.BLACK);
+                                        }
+                                    });
+                            builder.create().show();
+                        } catch (JsonParseException e) {
+                            e.printStackTrace();
+                        } catch (JsonMappingException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
 
 }
