@@ -18,6 +18,7 @@ import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 import edu.zhku.jsj144.lzc.video.R;
+import edu.zhku.jsj144.lzc.video.application.BaseApplication;
 import edu.zhku.jsj144.lzc.video.interceptor.JellyInterpolator;
 import edu.zhku.jsj144.lzc.video.util.MD5Util;
 import edu.zhku.jsj144.lzc.video.util.SharedPreferencesUtil;
@@ -37,7 +38,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText usernameEditText;
     private EditText passwordEditText;
 
-    private String url = "http://192.168.0.149:8080/video/service/r/sessions";
+    private String url = BaseApplication.REST_BASE_URL + "/sessions";
     private String username;
     private String password;
 

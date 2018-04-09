@@ -17,10 +17,10 @@ public class BaseApplication extends Application {
     private static Context context;
     private static Intent uploadIntent;
     private static AppPreferences appPreferences;
-    public static final String REST_BASE_URL = "http://192.168.0.149:8080/video/service/r";
-    public static final String UPLOAD_BASE_IP = "192.168.0.149";
-    public static final String PLAY_BASE_URL = "http://192.168.0.149";
-    public static final String PAGE_BASE_URL = "http://192.168.0.149:8081";
+    public static final String REST_BASE_URL = "https://v.eele.io:8443/video/service/r";
+    public static final String UPLOAD_BASE_IP = "v.eele.io";
+    public static final String PLAY_BASE_URL = "https://v.eele.io:8446";
+    public static final String PAGE_BASE_URL = "https://v.eele.io:8445";
 
     // 全局认证拦截器
     private static AuthInterceptor authInterceptor = new AuthInterceptor();

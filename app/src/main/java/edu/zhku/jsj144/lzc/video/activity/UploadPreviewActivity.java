@@ -1,5 +1,6 @@
 package edu.zhku.jsj144.lzc.video.activity;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -279,6 +280,7 @@ public class UploadPreviewActivity extends AppCompatActivity {
                                 i++;
                             }
                             AlertDialog.Builder builder = new AlertDialog.Builder(UploadPreviewActivity.this);
+                            Dialog dialog;
                             builder.setIcon(android.R.drawable.ic_dialog_info).setTitle("选择分类")
                                     .setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
                                         @Override
@@ -286,9 +288,11 @@ public class UploadPreviewActivity extends AppCompatActivity {
                                             cid = (String) ((Map<String, Object>) categories.get(which)).get("id");
                                             category.setText(items[which]);
                                             category.setTextColor(Color.BLACK);
+                                            dialog.dismiss();
                                         }
                                     });
-                            builder.create().show();
+                            dialog = builder.create();
+                            dialog.show();
                         } catch (JsonParseException e) {
                             e.printStackTrace();
                         } catch (JsonMappingException e) {

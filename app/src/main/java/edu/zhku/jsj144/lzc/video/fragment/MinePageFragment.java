@@ -79,6 +79,7 @@ public class MinePageFragment extends Fragment {
             }
         });
         setting = rootView.findViewById(R.id.setting);
+        setting.setVisibility(View.GONE);
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
